@@ -34,9 +34,9 @@ Contributions are always welcome! Just try to follow our coding style: [FastoGT 
 Build
 =====
 #### Android:
-```flutter create --project-name fastotvlite --org fastotv.lite -a java .```
+```flutter create --project-name fastotvlite --org com.fastotv.lite -a java .```
 #### iPhone
-```flutter create --project-name fastotvlite --org fastotv.lite -i swift .```
+```flutter create --project-name fastotvlite --org com.fastotv.lite -i swift .```
 
 
 License
