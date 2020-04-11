@@ -168,7 +168,7 @@ class LiveStream extends IStream {
   static const REQUESTED_FEILD = 'requested';
 
   LiveStream.empty()
-      : _channelInfo = ChannelInfo('', '', 0, false, 0, 0, EpgInfo('', [''], '', '', []), true, true, null),
+      : _channelInfo = ChannelInfo('', '', 0, false, 0, 0, false, EpgInfo('', [''], '', '', []), true, true, null, 0),
         _epgUrl = EPG_URL,
         _requested = false;
 
@@ -180,11 +180,13 @@ class LiveStream extends IStream {
             json[StreamBaseInfo.FAVORITE_FIELD],
             json[StreamBaseInfo.RECENT_FIELD],
             0,
+            false,
             EpgInfo(json[StreamBaseInfo.ID_FIELD], [json[EpgInfo.URLS_FIELD]], json[EpgInfo.DISPLAY_NAME_FIELD],
                 json[EpgInfo.ICON_FIELD], []),
             true,
             true,
-            null),
+            null,
+            0),
         _epgUrl = json[EPG_URL_FIELD] ?? EPG_URL,
         _requested = false;
 

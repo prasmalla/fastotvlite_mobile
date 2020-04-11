@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' show get;
 
 class StreamFilePicker {
-  static const TYPE = FileType.CUSTOM;
+  static const TYPE = FileType.custom;
 
   StreamFilePicker();
 
@@ -15,7 +15,7 @@ class StreamFilePicker {
 
   Future<File> _openFileExplorer() async {
     try {
-      _path = await FilePicker.getFilePath(type: FileType.ANY);
+      _path = await FilePicker.getFilePath(type: FileType.any);
     } on PlatformException catch (e) {
       print("Unsupported operation" + e.toString());
     }
