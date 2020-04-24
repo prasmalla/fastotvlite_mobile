@@ -50,12 +50,12 @@ class VodStream extends IStream {
     return _channelInfo.getCountry();
   }
 
-  String group() {
-    return _channelInfo.group;
+  List<String> groups() {
+    return _channelInfo.groups;
   }
 
-  void setGroup(String value) {
-    _channelInfo.group = value;
+  void setGroups(List<String> value) {
+    _channelInfo.groups = value;
   }
 
   String previewIcon() {
@@ -119,7 +119,7 @@ class VodStream extends IStream {
   VodStream.fromJson(Map<String, dynamic> json)
       : _channelInfo = VodInfo(
             json[StreamBaseInfo.ID_FIELD],
-            json[StreamBaseInfo.GROUP_FIELD],
+            json[StreamBaseInfo.GROUPS_FIELD],
             json[StreamBaseInfo.IARC_FIELD],
             json[StreamBaseInfo.FAVORITE_FIELD],
             json[StreamBaseInfo.RECENT_FIELD],
@@ -142,7 +142,7 @@ class VodStream extends IStream {
 
   Map<String, dynamic> toJson() => {
         StreamBaseInfo.ID_FIELD: id(),
-        StreamBaseInfo.GROUP_FIELD: group(),
+        StreamBaseInfo.GROUPS_FIELD: groups(),
         StreamBaseInfo.IARC_FIELD: iarc(),
         StreamBaseInfo.FAVORITE_FIELD: favorite(),
         StreamBaseInfo.RECENT_FIELD: recentTime(),

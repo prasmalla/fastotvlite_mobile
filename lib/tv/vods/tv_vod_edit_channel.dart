@@ -18,7 +18,8 @@ abstract class AbstractVodEditPageState extends EditStreamPageTV<AbstractVodEdit
   @override
   void initState() {
     super.initState();
-    groupController = TextEditingController(text: widget.stream.group());
+    final groups = stream().groups();
+    groupController = TextEditingController(text: groups);
     iarcController = TextEditingController(text: widget.stream.iarc().toString());
     nameController = TextEditingController(text: AppLocalizations.toUtf8(widget.stream.displayName()));
     iconController = TextEditingController(text: widget.stream.icon());
@@ -65,7 +66,7 @@ abstract class AbstractVodEditPageState extends EditStreamPageTV<AbstractVodEdit
 
   void onSave() {
     widget.stream.setDisplayName(nameController.text);
-    widget.stream.setGroup(groupController.text);
+    widget.stream.setGroups(groupController.text);
     widget.stream.setPrimaryUrl(videoLinkController.text);
     widget.stream.setIcon(iconController.text);
     widget.stream.setIarc(int.tryParse(iarcController.text) ?? 21);

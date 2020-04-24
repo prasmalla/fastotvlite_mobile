@@ -335,7 +335,7 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
   }
 
   void _deleteChannel(LiveStream channel) {
-    final _category = channel.group();
+    //final _category = channel.groups();
     widget.channels.remove(channel);
     if (widget.channels.isNotEmpty) {
       channelsMap[TR_ALL].remove(channel);

@@ -19,7 +19,8 @@ abstract class EditStreamPageState<T extends StatefulWidget> extends State<T> {
   @override
   void initState() {
     super.initState();
-    groupController = TextEditingController(text: stream().group());
+    final groups = stream().groups();
+    groupController = TextEditingController(text: groups);
     iarcController = TextEditingController(text: stream().iarc().toString());
   }
 

@@ -11,9 +11,9 @@ abstract class IStream {
 
   void setDisplayName(String value);
 
-  String group();
+  List<String> groups();
 
-  void setGroup(String value);
+  void setGroups(List<String> value);
 
   String icon();
 

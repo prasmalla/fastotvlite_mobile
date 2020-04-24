@@ -15,17 +15,11 @@ class StreamsParser<T extends IStream> {
       _savePushFavorite(element);
       _savePushRecent(element);
       _savePushChannel(TR_ALL, element);
-      List<String> temp = splitCategories(element.group());
+      List<String> temp = element.groups();
       temp.forEach((singleGroup) => _savePushChannel(singleGroup, element));
     });
     _channelsMap[TR_RECENT].sort((b, a) => a.recentTime().compareTo(b.recentTime()));
     return _channelsMap;
-  }
-
-  List<String> splitCategories(String initial) {
-    List<String> categ = [];
-    initial.contains(";") ? categ = initial.split(";") : categ.add(initial);
-    return categ;
   }
 
   void _savePushChannel(String category, T element) {

@@ -68,7 +68,7 @@ abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEd
 
   void onSave() {
     widget.stream.setDisplayName(nameController.text);
-    widget.stream.setGroup(groupController.text);
+    widget.stream.setGroups(groupController.text);
     widget.stream.setPrimaryUrl(videoLinkController.text);
     widget.stream.setIcon(iconController.text);
     widget.stream.setIarc(int.tryParse(iarcController.text) ?? 21);
