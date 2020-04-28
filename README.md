@@ -5,16 +5,16 @@ About FastoTVLite
 FastoTVLite - is a crossplatform free iptv/stream player. <br />
 
 ### Android Mobile/Tablet:
-![](https://fastotv.com/api/static/images/promo/android.png)
+![](https://fastotv.com/fastotv_site/api/static/images/promo/android.png)
 
 ### Android TV:
-![](https://fastotv.com/api/static/images/promo/android_tv.png)
+![](https://fastotv.com/fastotv_site/api/static/images/promo/android_tv.png)
 
 ### iPhone:
-![](https://fastotv.com/api/static/images/promo/iphone.jpeg)
+![](https://fastotv.com/fastotv_site/api/static/images/promo/iphone.jpeg)
 
 ### iPad:
-![](https://fastotv.com/api/static/images/promo/ipad.png)
+![](https://fastotv.com/fastotv_site/api/static/images/promo/ipad.png)
 
 Visit our site: [FastoTV](https://www.fastotv.com)
 
