@@ -335,7 +335,7 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
   }
 
   void _deleteChannel(LiveStream channel) {
-    //final _category = channel.groups();
+    final categories = channel.groups();
     widget.channels.remove(channel);
     if (widget.channels.isNotEmpty) {
       channelsMap[TR_ALL].remove(channel);
@@ -345,12 +345,14 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
       if (channelsMap[TR_FAVORITE].contains(channel)) {
         channelsMap[TR_FAVORITE].remove(channel);
       }
-      if (channelsMap.containsKey(_category)) {
-        channelsMap[_category].remove(channel);
-        if (channelsMap[_category].isEmpty) {
-          channelsMap.remove(_category);
-          _categories.remove(_category);
-          currentCategory = 2;
+      for (String category in categories) {
+        if (channelsMap.containsKey(category)) {
+          channelsMap[category].remove(channel);
+          if (channelsMap[category].isEmpty) {
+            channelsMap.remove(category);
+            _categories.remove(category);
+            currentCategory = 2;
+          }
         }
       }
       _playChannel(0);

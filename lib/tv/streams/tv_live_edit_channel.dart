@@ -40,7 +40,7 @@ abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEd
           child: SingleChildScrollView(
               child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
             textField('Title', nameFieldNode, nameController),
-            textField('Group', groupFieldNode, groupController),
+            textField('Groups', groupFieldNode, groupController),
             textField('Video link', urlFieldNode, videoLinkController),
             textField('Icon', iconFieldNode, iconController),
             textField('IARC', iarcFieldNode, iarcController)

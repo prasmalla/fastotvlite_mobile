@@ -15,10 +15,6 @@ dependencies:
     git:
       url: https://github.com/fastogt/fastotv_dart.git
       ref: master
-  video_player:
-    git:
-      url: https://github.com/fastogt/video_player.git
-      ref: master
   fastotv_common:
     git:
       url: https://github.com/fastogt/flutter_common.git
@@ -34,7 +30,7 @@ dependencies:
   cupertino_icons: ^0.1.3
   flutter_speed_dial: ^1.2.5
   unicorndial: ^1.1.5
-  shared_preferences: ^0.5.6+2
+  shared_preferences: ^0.5.7
   file_picker: ^1.6.2
   persist_theme:
     git:
@@ -43,7 +39,7 @@ dependencies:
       path: packages/persist_theme
   event_bus: ^1.1.1
   numberpicker: ^1.1.0
-  get_it: ^3.1.0
+  get_it: ^4.0.2
   rxdart: ^0.23.1
   double_back_to_close_app: ^0.1.2
   flutter_localizations:
