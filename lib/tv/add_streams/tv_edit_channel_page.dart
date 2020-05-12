@@ -14,13 +14,11 @@ abstract class EditStreamPageTV<T extends StatefulWidget> extends State<T> {
   final deleteButtonNode = FocusNode();
 
   TextEditingController nameController;
-  TextEditingController groupController;
   TextEditingController videoLinkController;
   TextEditingController iconController;
   TextEditingController iarcController;
 
   final nameFieldNode = TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
-  final groupFieldNode = TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
   final urlFieldNode = TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
   final iconFieldNode = TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
   final iarcFieldNode = TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));

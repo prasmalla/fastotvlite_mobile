@@ -32,6 +32,7 @@ dependencies:
   unicorndial: ^1.1.5
   shared_preferences: ^0.5.7
   file_picker: ^1.6.2
+  flutter_tags: ^0.4.8
   persist_theme:
     git:
       url: git://github.com/fastogt/plugins.git

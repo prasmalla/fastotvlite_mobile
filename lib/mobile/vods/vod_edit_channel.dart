@@ -35,6 +35,7 @@ abstract class _AbstractVodEditPageState extends EditStreamPageState<_AbstractVo
     widget.stream.setPrimaryUrl(videoLinkController.text);
     widget.stream.setIcon(iconController.text);
     widget.stream.setIarc(int.tryParse(iarcController.text) ?? 21);
+    widget.stream.setGroups(groups);
   }
 
   Widget editingPage() {
@@ -44,7 +45,7 @@ abstract class _AbstractVodEditPageState extends EditStreamPageState<_AbstractVo
               maxWidth: MediaQuery.of(context).size.shortestSide, maxHeight: MediaQuery.of(context).size.shortestSide),
           child: PreviewIcon.vod(iconController.text)),
       textField(translate(TR_EDIT_TITLE), nameController),
-      textField(translate(TR_EDIT_GROUP), groupController),
+      groupsField(),
       textField(translate(TR_EDIT_VIDEO_LINK), videoLinkController,
           onSubmitted: () => setState(() => validator = videoLinkController.text.isNotEmpty)),
       textField(translate(TR_EDIT_ICON), iconController, onSubmitted: () => setState(() {})),

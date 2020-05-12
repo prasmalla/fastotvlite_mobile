@@ -21,7 +21,6 @@ abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEd
   @override
   void initState() {
     super.initState();
-    groupController = TextEditingController(text: widget.stream.group());
     iarcController = TextEditingController(text: widget.stream.iarc().toString());
     nameController = TextEditingController(text: AppLocalizations.toUtf8(widget.stream.displayName()));
     iconController = TextEditingController(text: widget.stream.icon());
@@ -40,7 +39,6 @@ abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEd
           child: SingleChildScrollView(
               child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
             textField('Title', nameFieldNode, nameController),
-            textField('Groups', groupFieldNode, groupController),
             textField('Video link', urlFieldNode, videoLinkController),
             textField('Icon', iconFieldNode, iconController),
             textField('IARC', iarcFieldNode, iarcController)
@@ -51,8 +49,6 @@ abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEd
   void enterAction(FocusNode node) {
     if (node == nameFieldNode.main) {
       setFocus(nameFieldNode.text);
-    } else if (node == groupFieldNode.main) {
-      setFocus(groupFieldNode.text);
     } else if (node == urlFieldNode.main) {
       setFocus(urlFieldNode.text);
     } else if (node == iconFieldNode.main) {
@@ -68,7 +64,6 @@ abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEd
 
   void onSave() {
     widget.stream.setDisplayName(nameController.text);
-    widget.stream.setGroups(groupController.text);
     widget.stream.setPrimaryUrl(videoLinkController.text);
     widget.stream.setIcon(iconController.text);
     widget.stream.setIarc(int.tryParse(iarcController.text) ?? 21);

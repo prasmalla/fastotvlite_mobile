@@ -1,10 +1,12 @@
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotvlite/channels/istream.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tags/flutter_tags.dart';
 
 abstract class EditStreamPageState<T extends StatefulWidget> extends State<T> {
-  TextEditingController groupController;
   TextEditingController iarcController;
+  final GlobalKey<TagsState> _groupsStateKey = GlobalKey<TagsState>();
+  List<String> groups = [];
 
   bool validator = true;
 
@@ -19,8 +21,7 @@ abstract class EditStreamPageState<T extends StatefulWidget> extends State<T> {
   @override
   void initState() {
     super.initState();
-    final groups = stream().groups();
-    groupController = TextEditingController(text: groups);
+    groups = stream().groups();
     iarcController = TextEditingController(text: stream().iarc().toString());
   }
 
@@ -31,6 +32,7 @@ abstract class EditStreamPageState<T extends StatefulWidget> extends State<T> {
     return WillPopScope(
       onWillPop: () async {
         exitAndResetChanges();
+        return true;
       },
       child: Scaffold(
           appBar: AppBar(
@@ -73,5 +75,38 @@ abstract class EditStreamPageState<T extends StatefulWidget> extends State<T> {
 
   Widget deleteButton() {
     return IconButton(icon: Icon(Icons.delete), onPressed: () => Navigator.of(context).pop());
+  }
+
+  Widget groupsField() {
+    return Tags(
+        key: _groupsStateKey,
+        textField: TagsTextField(
+            hintText: 'Add group',
+            constraintSuggestion: false,
+            suggestions: [],
+            onSubmitted: (String str) {
+              setState(() {
+                groups.add(str);
+              });
+            }),
+        itemCount: groups.length,
+        itemBuilder: (int index) {
+          final item = groups[index];
+
+          return ItemTags(
+              // Each ItemTags must contain a Key. Keys allow Flutter to
+              // uniquely identify widgets.
+              key: Key(index.toString()),
+              index: index,
+              title: item,
+              combine: ItemTagsCombine.withTextBefore,
+              icon: ItemTagsIcon(icon: Icons.add),
+              removeButton: ItemTagsRemoveButton(onRemoved: () {
+                setState(() {
+                  groups.removeAt(index);
+                });
+                return true;
+              }));
+        });
   }
 }
