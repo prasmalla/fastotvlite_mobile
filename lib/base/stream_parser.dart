@@ -16,7 +16,7 @@ class StreamsParser<T extends IStream> {
       _savePushRecent(element);
       _savePushChannel(TR_ALL, element);
       List<String> temp = element.groups();
-      temp.forEach((singleGroup) => _savePushChannel(singleGroup, element));
+      temp.toSet().forEach((singleGroup) => _savePushChannel(singleGroup, element));
     });
     _channelsMap[TR_RECENT].sort((b, a) => a.recentTime().compareTo(b.recentTime()));
     return _channelsMap;
