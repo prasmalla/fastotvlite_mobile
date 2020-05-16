@@ -27,7 +27,7 @@ class ChannelPage extends StatefulWidget {
   _ChannelPageState createState() => _ChannelPageState();
 }
 
-class _ChannelPageState extends AppBarPlayerCommon<ChannelPage> {
+class _ChannelPageState extends AppBarPlayerLive<ChannelPage> {
   ProgramsBloc programsBloc;
   int currentPos;
   StreamPlayerPage _playerPage;
@@ -56,10 +56,8 @@ class _ChannelPageState extends AppBarPlayerCommon<ChannelPage> {
 
   void onLongTapRight() {}
 
-  Widget sideList() {
-    return !isVisiblePrograms
-        ? SizedBox()
-        : Expanded(flex: 2, child: ProgramsListView(programsBloc: programsBloc, textColor: textColor()));
+  Widget sideListContent() {
+    return Expanded(flex: 2, child: ProgramsListView(programsBloc: programsBloc, textColor: overlaysTextColor));
   }
 
   @override
@@ -123,20 +121,20 @@ class _ChannelPageState extends AppBarPlayerCommon<ChannelPage> {
     return BottomControls(
         programsBloc: programsBloc,
         buttons: <Widget>[
-          PlayerButtons.previous(onPressed: () => moveToPrevChannel(), color: controlsTextColor()),
+          PlayerButtons.previous(onPressed: () => moveToPrevChannel(), color: overlaysTextColor),
           createPlayPauseButton(),
-          PlayerButtons.next(onPressed: () => moveToNextChannel(), color: textColor()),
+          PlayerButtons.next(onPressed: () => moveToNextChannel(), color: overlaysTextColor),
           sideBarButton()
         ],
-        textColor: textColor(),
-        backgroundColor: backGroundColor());
+        textColor: overlaysTextColor,
+        backgroundColor: backgroundColor?.withOpacity(overlaysOpacity));
   }
 
   Widget appBar() {
     final cur = currentChannel();
     return ChannelPageAppBar(
-      backgroundColor: backGroundColor(),
-      textColor: textColor(),
+      backgroundColor: backgroundColor?.withOpacity(overlaysOpacity),
+      textColor: overlaysTextColor,
       link: cur.primaryUrl(),
       title: AppLocalizations.toUtf8(cur.displayName()),
       onChromeCast: () => _callback(),
