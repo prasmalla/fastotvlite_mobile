@@ -22,7 +22,7 @@ class VodPlayer extends StatefulWidget {
   }
 }
 
-class VodPlayerPageMobileState extends AppBarPlayerCommon<VodPlayer> {
+class VodPlayerPageMobileState extends AppBarPlayerVod<VodPlayer> {
   VodPlayerPageMobileState(VodStream channel);
 
   static const Duration SEEK_DURATION = Duration(seconds: 5);
@@ -67,8 +67,8 @@ class VodPlayerPageMobileState extends AppBarPlayerCommon<VodPlayer> {
     return ChannelPageAppBar(
         link: widget.channel.primaryUrl(),
         title: AppLocalizations.toUtf8(widget.channel.displayName()),
-        backgroundColor: backGroundColor(),
-        textColor: textColor(),
+        backgroundColor: backgroundColor.withOpacity(overlaysOpacity),
+        textColor: overlaysTextColor,
         onChromeCast: () => callback(),
         onExit: position());
   }
@@ -106,7 +106,7 @@ class VodPlayerPageMobileState extends AppBarPlayerCommon<VodPlayer> {
 
   Widget bottomControls() {
     return Container(
-        color: backGroundColor(),
+        color: backgroundColor.withOpacity(overlaysOpacity),
         width: MediaQuery.of(context).size.width,
         height: BOTTOM_CONTROL_HEIGHT + MediaQuery.of(context).padding.top,
         child: Stack(children: <Widget>[
@@ -116,12 +116,12 @@ class VodPlayerPageMobileState extends AppBarPlayerCommon<VodPlayer> {
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
                 Spacer(),
                 PlayerButtons.seekBackward(
-                    onPressed: () => _vodPlayerPage.seekBackward(SEEK_DURATION), color: textColor()),
+                    onPressed: () => _vodPlayerPage.seekBackward(SEEK_DURATION), color: overlaysTextColor),
                 SizedBox(width: 16),
                 createPlayPauseButton(),
                 SizedBox(width: 16),
                 PlayerButtons.seekForward(
-                    onPressed: () => _vodPlayerPage.seekForward(SEEK_DURATION), color: textColor()),
+                    onPressed: () => _vodPlayerPage.seekForward(SEEK_DURATION), color: overlaysTextColor),
                 Spacer()
               ]))
         ]));
