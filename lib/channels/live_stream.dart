@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fastotv_dart/commands_info/meta_url.dart';
 import 'package:quiver/core.dart';
 
 import 'package:fastotv_common/time_manager.dart';
@@ -169,14 +170,14 @@ class LiveStream extends IStream {
   static const REQUESTED_FEILD = 'requested';
 
   LiveStream.empty()
-      : _channelInfo = ChannelInfo('', '', 0, false, 0, 0, false, EpgInfo('', [''], '', '', []), true, true, null, 0, []),
+      : _channelInfo = ChannelInfo('', <String>[], 0, false, 0, 0, false, EpgInfo('', [''], '', '', []), true, true, null, 0, <MetaUrl>[]),
         _epgUrl = EPG_URL,
         _requested = false;
 
   LiveStream.fromJson(Map<String, dynamic> json)
       : _channelInfo = ChannelInfo(
             json[StreamBaseInfo.ID_FIELD],
-            json[StreamBaseInfo.GROUPS_FIELD],
+            json[StreamBaseInfo.GROUPS_FIELD].cast<String>(),
             json[StreamBaseInfo.IARC_FIELD],
             json[StreamBaseInfo.FAVORITE_FIELD],
             json[StreamBaseInfo.RECENT_FIELD],
@@ -188,7 +189,7 @@ class LiveStream extends IStream {
             true,
             null,
             0,
-            []),
+            <MetaUrl>[]),
         _epgUrl = json[EPG_URL_FIELD] ?? EPG_URL,
         _requested = false;
 

@@ -1,3 +1,4 @@
+import 'package:fastotv_dart/commands_info/meta_url.dart';
 import 'package:fastotv_dart/commands_info/movie_info.dart';
 import 'package:fastotv_dart/commands_info/stream_base_info.dart';
 import 'package:fastotv_dart/commands_info/vod_info.dart';
@@ -113,13 +114,13 @@ class VodStream extends IStream {
   final VodInfo _channelInfo;
 
   VodStream.empty()
-      : _channelInfo = VodInfo('', '', 21, false, 0, 0, false,
-            MovieInfo([''], '', '', '', '', 0, 0, '', 0, MovieType.VODS), true, true, null, 0, []);
+      : _channelInfo = VodInfo('', <String>[], 21, false, 0, 0, false,
+            MovieInfo([''], '', '', '', '', 0, 0, '', 0, MovieType.VODS), true, true, null, 0, <MetaUrl>[]);
 
   VodStream.fromJson(Map<String, dynamic> json)
       : _channelInfo = VodInfo(
             json[StreamBaseInfo.ID_FIELD],
-            json[StreamBaseInfo.GROUPS_FIELD],
+            json[StreamBaseInfo.GROUPS_FIELD].cast<String>(),
             json[StreamBaseInfo.IARC_FIELD],
             json[StreamBaseInfo.FAVORITE_FIELD],
             json[StreamBaseInfo.RECENT_FIELD],
@@ -140,7 +141,7 @@ class VodStream extends IStream {
             true,
             null,
             0,
-            []);
+            <MetaUrl>[]);
 
   Map<String, dynamic> toJson() => {
         StreamBaseInfo.ID_FIELD: id(),
