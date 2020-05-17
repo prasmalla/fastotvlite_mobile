@@ -179,7 +179,6 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
         default:
           break;
       }
-      setState(() {});
     }
   }
 
@@ -213,7 +212,6 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
         currentChannel = i;
         _playChannel(i);
         _channelsController.moveToPosition(i);
-        FocusScope.of(context).requestFocus(playerFocus);
         setFullscreenOff(false);
         return;
       }
@@ -258,7 +256,6 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
     _playing = _currentChannels[currentChannel];
     _initProgramsBloc(_playing);
     _playerPage.playChannel(_playing);
-    setState(() {});
   }
 
   void _showSnackBar(bool show) {
@@ -845,7 +842,7 @@ class _TvPlayerWrapState extends State<_TvPlayerWrap> {
     return Container(
         height: !widget.fullscreen ? widget.availableSpace.height / 2 : widget.availableSpace.height,
         decoration: BoxDecoration(color: Colors.black, border: Border.all(color: _color, width: 2)),
-        child: Focus(onKey: widget.onKey, focusNode: _node, child: widget.child));
+        child: Focus(onKey: widget.onKey, focusNode: _node, child: widget.child, autofocus: widget.fullscreen));
   }
 
   void _onFocusChange() {
