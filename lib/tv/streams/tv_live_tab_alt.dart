@@ -43,6 +43,8 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
   static const LIST_ITEM_SIZE = 64.0;
   static const LIST_HEADER_SIZE = 32.0;
 
+  FocusNode _categoriesNode = FocusNode();
+
   bool _isSnackbarActive = false;
 
   bool notFullScreen = true;
@@ -50,51 +52,151 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
   double scale;
 
   StreamPlayerPage _playerPage;
+
   FocusNode playerFocus = FocusNode();
 
-  List<String> _categories = [];
-  int currentCategory = 1;
+  String _currentCategory = TR_ALL;
+  
+  int currentChannel = 0;
 
   Map<String, List<LiveStream>> channelsMap = {};
+
+  List<String> get _categories => channelsMap.keys.toList();
+
+  List<LiveStream> get _currentChannels => channelsMap[_currentCategory];
+
+  LiveStream get _currentStream => _currentChannels[currentChannel];
+
+  LiveStream _playing;
+
   CustomScrollController _channelsController = CustomScrollController(itemHeight: LIST_ITEM_SIZE);
-  int currentChannel = 0;
-  LiveStream currentPlaying;
 
   ProgramsBloc programsBloc;
-
-  void _parseChannels() {
-    channelsMap = StreamsParser<LiveStream>(widget.channels).parseChannels();
-    _categories = channelsMap.keys.toList();
-    if (channelsMap[TR_RECENT].isEmpty) {
-      currentCategory++;
-    }
-  }
-
-  LiveStream _getCurrentChannel() {
-    final channels = _getCurrentChannels();
-    return channels[currentChannel];
-  }
-
-  List<LiveStream> _getCurrentChannels() {
-    final category = _categories[currentCategory];
-    return channelsMap[category];
-  }
 
   @override
   void initState() {
     super.initState();
-
     final settings = locator<LocalStorageService>();
     scale = settings.screenScale();
-
     _parseChannels();
     widget.stream.stream.asBroadcastStream().listen((command) => controlFromTabs(command));
-
-    final channel = _getCurrentChannel();
-    currentPlaying = channel;
-    _playerPage = StreamPlayerPage(channel: channel);
-    initProgramsBloc();
+    _playing = _currentChannels[0];
+    _initPlayerPage(_playing);
+    _initProgramsBloc(_playing);
     WidgetsBinding.instance.addPostFrameCallback((_) => _lastViewed());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    programsBloc.dispose();
+    _channelsController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final availableSpace = MediaQuery.of(context).size * scale;
+
+    return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+      Visibility(
+          visible: notFullScreen,
+          child: Column(children: <Widget>[categoriesList(availableSpace), Divider(height: 0.0), channelsList(availableSpace)])),
+      Visibility(visible: notFullScreen, child: VerticalDivider(width: 0.0)),
+      Expanded(
+          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+        _TvPlayerWrap(_playerPage, availableSpace, !notFullScreen, _onPlayer),
+        Visibility(visible: notFullScreen, child: channelInfo(availableSpace))
+      ])),
+      Visibility(visible: notFullScreen, child: programs(availableSpace))
+    ]);
+  }
+
+  Widget categoriesList(Size availableSpace) {
+    return _Categories(
+        focus: _categoriesNode,
+        onKey: (event, node) => _onCategory(event, node),
+        category: _currentCategory,
+        size: Size(availableSpace.width / 5, LIST_HEADER_SIZE));
+  }
+
+  Widget channelsList(Size availableSpace) {
+    final _size = Size(availableSpace.width / 5, availableSpace.height - LIST_HEADER_SIZE - 72);
+    if (_currentCategory == TR_FAVORITE && channelsMap[TR_FAVORITE].isEmpty) {
+      return _NoChannels.favorite(_size);
+    } else if (_currentCategory == TR_RECENT && channelsMap[TR_RECENT].isEmpty) {
+      return _NoChannels.recent(_size);
+    }
+    return _ChannelsList(
+        onKey: (node, event, index) => _onChannel(node, event, index),
+        channels: _currentChannels,
+        scrollController: _channelsController.controller,
+        itemHeight: LIST_ITEM_SIZE,
+        size: _size);
+  }
+  
+  Widget channelInfo(Size availableSpace) {
+    return Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
+          _TimeLine(programsBloc, Size(availableSpace.width / 2, 36 * scale)),
+          SizedBox(height: 16 * scale),
+          Row(children: <Widget>[
+            Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+              Text(AppLocalizations.of(context).translate(TR_CURRENT_CHANNEL)),
+              Text(AppLocalizations.toUtf8(_playing.displayName()),
+                  style: TextStyle(fontSize: 24 * scale), overflow: TextOverflow.ellipsis)
+            ]),
+            Spacer(),
+            FavoriteStarButton(_playing.favorite(),
+                onFavoriteChanged: (bool value) => _handleFavorite(), selectedColor: CustomColor().tvSelectedColor()),
+            CustomIcons(Icons.edit, () => _editChannel(_playing)),
+            CustomIcons(Icons.delete, () => _deleteChannel(_playing))
+          ]),
+          SizedBox(height: 16 * scale),
+          _ProgramTitle(programsBloc),
+          _ProgramName(programsBloc, Size(availableSpace.width / 2, 24 * scale), 24 * scale)
+        ]));
+    }
+
+  Widget programs(Size availableSpace) {
+    return _Programs(
+        LIST_ITEM_SIZE,
+        Size(availableSpace.width * 0.3, availableSpace.height - TABBAR_HEIGHT),
+        programsBloc);
+  }
+
+  Color selectedColor(FocusNode focus) => focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
+
+  void controlFromTabs(NotificationType command) {
+    if (context != null) {
+      switch (command) {
+        case NotificationType.TO_SETTINGS:
+          _playerPage.pause();
+          break;
+        case NotificationType.EXIT_SETTINGS:
+          _playerPage.playChannel(_playing);
+          break;
+        default:
+          break;
+      }
+      setState(() {});
+    }
+  }
+
+  // init
+  void _parseChannels() {
+    channelsMap = StreamsParser<LiveStream>(widget.channels).parseChannels();
+  }
+
+  void _initPlayerPage(LiveStream channel) {
+    if (_playerPage != null) {
+      return;
+    }
+    _playerPage = StreamPlayerPage(channel: channel);    
+  }
+
+  void _initProgramsBloc(LiveStream channel) {
+    programsBloc = ProgramsBloc(channel);
   }
 
   void _lastViewed() {
@@ -118,130 +220,9 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    programsBloc.dispose();
-    _channelsController.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final availableSpace = MediaQuery.of(context).size * scale;
-
-    Widget categoriesWidget() {
-      return _Categories(
-          onKey: _onCategory,
-          category: _categories[currentCategory],
-          size: Size(availableSpace.width / 5, LIST_HEADER_SIZE));
-    }
-
-    Widget channelsList() {
-      final channels = _getCurrentChannels();
-      final _size = Size(availableSpace.width / 5, availableSpace.height - LIST_HEADER_SIZE - TABBAR_HEIGHT);
-      if (currentCategory == 0 && channelsMap[TR_FAVORITE].length == 0) {
-        return _NoChannels.favorite(_size);
-      } else if (currentCategory == 1 && channelsMap[TR_RECENT].length == 0) {
-        return _NoChannels.recent(_size);
-      }
-      return _ChannelsList(
-          onTap: (index) => _playChannel(index),
-          channels: channels,
-          scrollController: _channelsController.controller,
-          itemHeight: LIST_ITEM_SIZE,
-          size: _size);
-    }
-
-    Widget channelInfo() {
-      return Padding(
-          padding: EdgeInsets.all(16.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
-            _TimeLine(programsBloc, Size(availableSpace.width / 2, 36 * scale)),
-            SizedBox(height: 16 * scale),
-            Row(children: <Widget>[
-              Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                Text(AppLocalizations.of(context).translate(TR_CURRENT_CHANNEL)),
-                Text(AppLocalizations.toUtf8(currentPlaying.displayName()),
-                    style: TextStyle(fontSize: 24 * scale), overflow: TextOverflow.ellipsis)
-              ]),
-              Spacer(),
-              FavoriteStarButton(currentPlaying.favorite(),
-                  onFavoriteChanged: (bool value) => _handleFavorite(), selectedColor: CustomColor().tvSelectedColor()),
-              CustomIcons(Icons.edit, () => _editChannel(currentPlaying)),
-              CustomIcons(Icons.delete, () => _deleteChannel(currentPlaying))
-            ]),
-            SizedBox(height: 16 * scale),
-            _ProgramTitle(programsBloc),
-            _ProgramName(programsBloc, Size(availableSpace.width / 2, 24 * scale), 24 * scale)
-          ]));
-    }
-
-    Widget programs() {
-      return _Programs(
-          LIST_ITEM_SIZE, Size(availableSpace.width * 0.3, availableSpace.height - TABBAR_HEIGHT), programsBloc);
-    }
-
-    return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-      Visibility(
-          visible: notFullScreen,
-          child: Column(children: <Widget>[categoriesWidget(), Divider(height: 0.0), channelsList()])),
-      Visibility(visible: notFullScreen, child: VerticalDivider(width: 0.0)),
-      Expanded(
-          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-        _TvPlayerWrap(_playerPage, availableSpace, !notFullScreen, _onPlayer),
-        Visibility(visible: notFullScreen, child: channelInfo())
-      ])),
-      Visibility(visible: notFullScreen, child: programs())
-    ]);
-  }
-
-  Color selectedColor(FocusNode focus) => focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
-
-  void controlFromTabs(NotificationType command) {
-    if (context != null) {
-      switch (command) {
-        case NotificationType.TO_SETTINGS:
-          _playerPage.pause();
-          break;
-        case NotificationType.EXIT_SETTINGS:
-          final channel = _getCurrentChannel();
-          _playerPage.playChannel(channel);
-          break;
-        default:
-          break;
-      }
-      setState(() {});
-    }
-  }
-
-  void sendRecent() {
-    DateTime now = DateTime.now();
-    final channel = _getCurrentChannel();
-    channel.setRecentTime(now.millisecondsSinceEpoch);
-  }
-
-  void _prevCategory() {
-    currentChannel = 0;
-    if (currentCategory == 0) {
-      currentCategory = _categories.length - 1;
-    } else {
-      currentCategory--;
-    }
-  }
-
-  void _nextCategory() {
-    currentChannel = 0;
-    if (currentCategory == _categories.length - 1) {
-      currentCategory = 0;
-    } else {
-      currentCategory++;
-    }
-  }
-
+  // player
   void _playNext() {
-    final channels = _getCurrentChannels();
-    if (currentChannel == channels.length - 1) {
+    if (currentChannel == _currentChannels.length - 1) {
       if (notFullScreen) {
         _channelsController.moveToTop();
       }
@@ -252,31 +233,31 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
       }
       currentChannel++;
     }
+    _playing = _currentStream;
     _playChannel(currentChannel);
   }
 
   void _playPrev() {
     if (currentChannel == 0) {
-      final channels = _getCurrentChannels();
       if (notFullScreen) {
         _channelsController.moveToBottom();
       }
-      currentChannel = channels.length - 1;
+      currentChannel = _currentChannels.length - 1;
     } else {
       if (notFullScreen) {
         _channelsController.moveUp();
       }
       currentChannel--;
     }
+    _playing = _currentStream;
     _playChannel(currentChannel);
   }
 
   void _playChannel(int index) {
     currentChannel = index;
-    currentPlaying = _getCurrentChannel();
-    initProgramsBloc();
-    _playerPage.playChannel(currentPlaying);
-    _addRecent(currentPlaying);
+    _playing = _currentChannels[currentChannel];
+    _initProgramsBloc(_playing);
+    _playerPage.playChannel(_playing);
     setState(() {});
   }
 
@@ -287,7 +268,6 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
 
     if (show) {
       _isSnackbarActive = true;
-      final channel = _getCurrentChannel();
       final contentColor = CustomColor().themeBrightnessColor(context);
       final backColor = Theme.of(context).brightness == Brightness.dark ? Colors.black87 : Colors.white70;
       final snack = SnackBar(
@@ -295,7 +275,7 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
           content: Container(
               child: Row(children: <Widget>[
             SizedBox(width: 32),
-            Text(AppLocalizations.toUtf8(channel.displayName()),
+            Text(AppLocalizations.toUtf8(_playing.displayName()),
                 style: TextStyle(fontSize: 36, color: contentColor),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -311,6 +291,7 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
     }
   }
 
+  // favorite
   void _addFavorite(LiveStream channel) {
     channelsMap[TR_FAVORITE].insert(0, channel);
   }
@@ -320,9 +301,16 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
   }
 
   void _handleFavorite() {
-    currentPlaying.setFavorite(!currentPlaying.favorite());
-    !currentPlaying.favorite() ? _deleteFavorite(currentPlaying) : _addFavorite(currentPlaying);
+    _playing.setFavorite(!_playing.favorite());
+    !_playing.favorite() ? _deleteFavorite(_playing) : _addFavorite(_playing);
     setState(() {});
+  }
+
+  // recent
+  void sendRecent() {
+    DateTime now = DateTime.now();
+    _playing.setRecentTime(now.millisecondsSinceEpoch);
+    _addRecent(_playing);
   }
 
   void _addRecent(LiveStream channel) {
@@ -351,7 +339,7 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
           if (channelsMap[category].isEmpty) {
             channelsMap.remove(category);
             _categories.remove(category);
-            currentCategory = 2;
+            _currentCategory = TR_ALL;
           }
         }
       }
@@ -378,6 +366,7 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
     }
   }
 
+  // controls
   bool _onCategory(FocusNode node, RawKeyEvent event) {
     if (event is RawKeyDownEvent && event.data is RawKeyEventDataAndroid) {
       if (node.hasFocus || node.hasPrimaryFocus) {
@@ -397,10 +386,68 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
             break;
 
           case KEY_RIGHT:
-            _nextCategory();
+            int _cur = _categories.indexOf(_currentCategory);
+            if (_cur == _categories.length - 1) {
+              _cur = 0;
+            } else {
+              _cur++;
+            }
+            _currentCategory = _categories[_cur];
+            if (_channelsController.controller.hasClients) {
+              _channelsController.moveToTop();
+            }
             break;
+
           case KEY_LEFT:
-            _prevCategory();
+            int _cur = _categories.indexOf(_currentCategory);
+            if (_cur == 0) {
+              _cur = _categories.length - 1;
+            } else {
+              _cur--;
+            }
+            _currentCategory = _categories[_cur];
+            if (_channelsController.controller.hasClients) {
+              _channelsController.moveToTop();
+            }
+            break;
+
+          default:
+            break;
+        }
+        setState(() {});
+      }
+    }
+    return node.hasFocus;
+  }
+
+  bool _onChannel(FocusNode node, RawKeyEvent event, int index) {
+    if (event is RawKeyDownEvent && event.data is RawKeyEventDataAndroid) {
+      if (node.hasFocus || node.hasPrimaryFocus) {
+        RawKeyDownEvent rawKeyDownEvent = event;
+        RawKeyEventDataAndroid rawKeyEventDataAndroid = rawKeyDownEvent.data;
+        switch (rawKeyEventDataAndroid.keyCode) {
+          case BACK:
+          case BACKSPACE:
+          case KEY_LEFT:
+            FocusScope.of(context).requestFocus(_categoriesNode);
+            break;
+
+          case KEY_UP:
+            FocusScope.of(context).focusInDirection(TraversalDirection.up);
+            break;
+
+          case KEY_DOWN:
+            FocusScope.of(context).focusInDirection(TraversalDirection.down);
+            break;
+
+          case ENTER:
+          case KEY_CENTER:
+          case KEY_DOWN:
+            _playChannel(index);
+            break;
+
+          case KEY_RIGHT:
+            FocusScope.of(context).focusInDirection(TraversalDirection.right);
             break;
 
           default:
@@ -448,10 +495,8 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
           case KEY_LEFT:
           case PREVIOUS:
             if (!notFullScreen) {
-              _playPrev();
               sendRecent();
-              final channel = _getCurrentChannel();
-              _addRecent(channel);
+              _playPrev();
             } else {
               FocusScope.of(context).focusInDirection(TraversalDirection.left);
             }
@@ -460,10 +505,8 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
           case KEY_RIGHT:
           case NEXT:
             if (!notFullScreen) {
-              _playNext();
               sendRecent();
-              final channel = _getCurrentChannel();
-              _addRecent(channel);
+              _playNext();
             } else {
               FocusScope.of(context).focusInDirection(TraversalDirection.right);
             }
@@ -504,16 +547,69 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
         _channelsController.jumpToPosition(currentChannel);
       });
     } else {
-      final channel = _getCurrentChannel();
       sendRecent();
-      _addRecent(channel);
-      settings.setLastChannel(channel.id());
+      settings.setLastChannel(_playing.id());
     }
   }
+}
 
-  void initProgramsBloc() {
-    final channel = _getCurrentChannel();
-    programsBloc = ProgramsBloc(channel);
+class _Categories extends StatefulWidget {
+  final String category;
+  final Size size;
+  final FocusNode focus;
+  final bool Function(FocusNode node, RawKeyEvent event) onKey;
+
+  _Categories({this.category, this.size, this.onKey, this.focus});
+
+  @override
+  _CategoriesState createState() => _CategoriesState();
+}
+
+class _CategoriesState extends State<_Categories> {
+  Color _color = CustomColor().tvUnselectedColor();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.focus.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.focus.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+        focusNode: widget.focus,
+        onKey: (event, node) => widget.onKey(event, node),
+        child: Container(
+            width: widget.size.width,
+            height: widget.size.height,
+            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
+              Icon(Icons.keyboard_arrow_left, color: _color),
+              Text(_title(widget.category)),
+              Icon(Icons.keyboard_arrow_right, color: _color)
+            ])));
+  }
+
+  void _onFocusChange() {
+    setState(() {
+      if (widget.focus.hasFocus) {
+        _color = CustomColor().tvSelectedColor();
+      } else {
+        _color = CustomColor().tvUnselectedColor();
+      }
+    });
+  }
+
+  String _title(String title) {
+    if (title == TR_ALL || title == TR_RECENT || title == TR_FAVORITE) {
+      return AppLocalizations.of(context).translate(title);
+    }
+    return AppLocalizations.toUtf8(title);
   }
 }
 
@@ -522,47 +618,50 @@ class _ChannelsList extends StatelessWidget {
   final ScrollController scrollController;
   final Size size;
   final double itemHeight;
-  final void Function(int index) onTap;
+  final bool Function(FocusNode node, RawKeyEvent event, int index) onKey;
 
-  _ChannelsList({this.channels, this.scrollController, this.itemHeight, this.size, this.onTap});
-
-  Widget _channelAvatar(LiveStream channel) => PreviewIcon.live(channel.icon(), height: 40, width: 40);
+  _ChannelsList(
+      {@required this.channels,
+      this.scrollController,
+      @required this.onKey,
+      this.itemHeight,
+      @required this.size});
 
   @override
   Widget build(BuildContext context) {
+    final _itemHeight = itemHeight ?? 64;
     return Container(
         width: size.width,
         height: size.height,
         child: ListView.builder(
-            controller: scrollController,
+            controller: scrollController ?? ScrollController(),
             itemCount: channels.length,
-            itemExtent: itemHeight,
+            itemExtent: _itemHeight,
             itemBuilder: (context, index) {
               final channel = channels[index];
-              return Center(
-                  child: ListTile(
-                      onTap: () => onTap(index),
-                      leading: _channelAvatar(channel),
-                      title: Text(AppLocalizations.toUtf8(channel.displayName()),
-                          style: TextStyle(fontSize: itemHeight / 4), maxLines: 2, overflow: TextOverflow.ellipsis)));
+              return _ChannelTile(channel: channel, onKey: (node, event) => onKey(node, event, index), itemHeight: _itemHeight);
             }));
   }
 }
 
-class _Categories extends StatefulWidget {
-  final String category;
-  final Size size;
+class _ChannelTile extends StatefulWidget {
+  final LiveStream channel;
+  final double itemHeight;
   final bool Function(FocusNode node, RawKeyEvent event) onKey;
 
-  _Categories({this.category, this.size, this.onKey});
+  _ChannelTile(
+      {@required this.channel,
+      @required this.onKey,
+      this.itemHeight});
 
   @override
-  _CategoriesState createState() => _CategoriesState();
+  _ChannelTileState createState() => _ChannelTileState();
 }
 
-class _CategoriesState extends State<_Categories> {
-  FocusNode _node = FocusNode();
-  Color _color = CustomColor().tvUnselectedColor();
+class _ChannelTileState extends State<_ChannelTile> {
+  static const Size CHANNEL_AVATAR_SIZE = Size(40.0, 40.0);
+
+  final FocusNode _node = FocusNode();
 
   @override
   void initState() {
@@ -580,32 +679,40 @@ class _CategoriesState extends State<_Categories> {
   Widget build(BuildContext context) {
     return Focus(
         focusNode: _node,
-        onKey: (event, node) => widget.onKey(event, node),
-        child: Container(
-            width: widget.size.width,
-            height: widget.size.height,
-            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-              Icon(Icons.keyboard_arrow_left, color: _color),
-              Text(_title(widget.category)),
-              Icon(Icons.keyboard_arrow_right, color: _color)
-            ])));
+        onKey: (node, event) => widget.onKey(node, event),
+        child: Stack(children: <Widget>[_background(), _tile()]));
+  }
+
+  // private:
+  Widget _background() {
+    return Container(
+      color: _backgroundColor(),
+    );
+  }
+
+  Widget _tile() {
+    return ListTile(
+        leading: _channelAvatar(widget.channel),
+        title: Text(AppLocalizations.toUtf8(widget.channel.displayName()),
+            style: TextStyle(fontSize: widget.itemHeight / 4),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis));
+  }
+
+  Widget _channelAvatar(LiveStream channel) {
+    return PreviewIcon.live(channel.icon(), height: CHANNEL_AVATAR_SIZE.height, width: CHANNEL_AVATAR_SIZE.width);
+  }
+
+  Color _backgroundColor() {
+    if (!_node.hasFocus) {
+      return Colors.transparent;
+    }
+
+    return Theme.of(context).focusColor;
   }
 
   void _onFocusChange() {
-    setState(() {
-      if (_node.hasFocus) {
-        _color = CustomColor().tvSelectedColor();
-      } else {
-        _color = CustomColor().tvUnselectedColor();
-      }
-    });
-  }
-
-  String _title(String title) {
-    if (title == TR_ALL || title == TR_RECENT || title == TR_FAVORITE) {
-      return AppLocalizations.of(context).translate(title);
-    }
-    return AppLocalizations.toUtf8(title);
+    setState(() {});
   }
 }
 
