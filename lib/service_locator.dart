@@ -1,5 +1,6 @@
 import 'package:fastotv_common/package_manager.dart';
 import 'package:fastotv_common/runtime_device.dart';
+import 'package:fastotv_common/time_manager.dart';
 import 'package:fastotvlite/events/stream_list_events.dart';
 import 'package:fastotvlite/shared_prefs.dart';
 import 'package:get_it/get_it.dart';
@@ -20,4 +21,7 @@ Future setupLocator() async {
 
   var package = await PackageManager.getInstance();
   locator.registerSingleton<PackageManager>(package);
+
+  var time = await TimeManager.getInstance();
+  locator.registerSingleton<TimeManager>(time);
 }
