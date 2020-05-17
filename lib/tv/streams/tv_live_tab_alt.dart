@@ -577,7 +577,7 @@ class _CategoriesState extends State<_Categories> {
   @override
   void dispose() {
     super.dispose();
-    widget.focus.dispose();
+    widget.focus.removeListener(_onFocusChange);
   }
 
   @override
