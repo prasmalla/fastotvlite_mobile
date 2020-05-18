@@ -160,21 +160,23 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    bool onTitlePush(TvChannelNotification notification) {
-      switch (notification.title) {
-        case NotificationType.FULLSCREEN:
+  bool onTitlePush(TvChannelNotification notification) {
+    switch (notification.title) {
+      case NotificationType.FULLSCREEN:
+        if (isVisible != notification.visibility) {
           setState(() {
             isVisible = notification.visibility;
           });
-          break;
-        default:
-      }
-
-      return true;
+        }
+        break;
+      default:
     }
 
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     Widget _home() {
       return _tabController.length > 0
           ? TabBarView(key: UniqueKey(), controller: _tabController, children: _typesTabView)
