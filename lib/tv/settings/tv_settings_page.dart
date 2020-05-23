@@ -11,6 +11,7 @@ import 'package:fastotvlite/tv/settings/tv_age_picker.dart';
 import 'package:fastotvlite/tv/settings/tv_language_picker.dart';
 import 'package:fastotvlite/tv/settings/tv_padding.dart';
 import 'package:fastotvlite/tv/settings/tv_theming.dart';
+import 'package:fastotvlite/tv/settings/tv_time_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:persist_theme/persist_theme.dart';
@@ -36,9 +37,6 @@ class SettingPageTV extends StatefulWidget {
 
 class _SettingPageTVState extends State<SettingPageTV> {
   static const LIST_ITEM_SIZE = 60.0;
-  static const LIST_HEADER_SIZE = 32.0;
-  static const DESCRIPTION_FONT_SIZE = 20.0;
-  static const INFO_FONT_SIZE = 20.0;
 
   int currentType = 0;
   FocusNode categoriesList = FocusNode();
@@ -51,7 +49,7 @@ class _SettingPageTVState extends State<SettingPageTV> {
 
   final activeColor = CustomColor().tvSelectedColor();
 
-  static const ITEM_LIST = [TR_PARENTAL_CONTROL, TR_THEME, TR_SCREEN_SIZE, TR_LANGUAGE];
+  static const ITEM_LIST = [TR_PARENTAL_CONTROL, TR_THEME, TR_SCREEN_SIZE, TR_LANGUAGE, TR_TIME_FORMAT];
 
   Widget _getCurrentSetting(int current) {
     switch (current) {
@@ -65,6 +63,8 @@ class _SettingPageTVState extends State<SettingPageTV> {
         return PaddingSettings(settingsList, () => _toCategories(), paddingCallback);
       case 3:
         return LanguagePickerTV(settingsList, () => setState(() {}));
+      case 4:
+        return ClockFormatPickerTV(settingsList, () => setState(() {}));
       default:
         return Icon(Icons.info);
     }

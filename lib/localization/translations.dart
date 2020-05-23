@@ -54,6 +54,7 @@ const String TR_ACCENT_COLOR = "Accent color";
 
 const String TR_LOCALIZATION = "Localization";
 const String TR_LANGUAGE = 'Language';
+const String TR_TIME_FORMAT = 'Time format';
 const String TR_LANGUAGE_CHOOSE = 'Choose Language';
 const String TR_LANGUAGE_NAME = 'Language name';
 

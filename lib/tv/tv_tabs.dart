@@ -13,6 +13,7 @@ import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/constants.dart';
 import 'package:fastotvlite/events/ascending.dart';
 import 'package:fastotvlite/events/stream_list_events.dart';
+import 'package:fastotvlite/events/tv_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/notification.dart';
@@ -214,10 +215,21 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
                                 CustomIcons(Icons.add_circle, () => _onAdd()),
                                 CustomIcons(Icons.settings, () => _toSettings()),
                                 CustomIcons(Icons.power_settings_new, () => _showExitDialog()),
-                                Clock.full(textColor: CustomColor().themeBrightnessColor(context))
+                                _clock()
                               ])),
                       Expanded(child: _home())
                     ])))));
+  }
+
+  Widget _clock() {
+    final settings = locator<LocalStorageService>();
+    final _initFormat = settings.timeFormat();
+    final tvTabsEvents = locator<TvTabsEvents>();
+    final color = CustomColor().themeBrightnessColor(context);
+    return StreamBuilder<ClockFormatChanged>(
+      initialData: ClockFormatChanged(_initFormat),
+      stream: tvTabsEvents.subscribe<ClockFormatChanged>(),
+      builder: (context, snapshot) => Clock.full(width: 108, textColor: color, hour24: snapshot.data.hour24));
   }
 
   void _toSettings() async {
