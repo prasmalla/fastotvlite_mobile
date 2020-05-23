@@ -38,6 +38,7 @@ class LocalStorageService {
 
   static const String _langCodeKey = 'lang_code';
   static const String _countryCodeKey = 'country_code';
+  static const String _timeFormatKey = 'time_format';
 
   String langCode() {
     return _preferences.getString(_langCodeKey);
@@ -53,6 +54,14 @@ class LocalStorageService {
 
   void setCountryCode(String code) {
     _preferences.setString(_countryCodeKey, code);
+  }
+
+  bool timeFormat() {
+    return _preferences.getBool(_timeFormatKey) ?? true;
+  }
+
+  void setTimeFormat(bool is24) {
+    _preferences.setBool(_timeFormatKey, is24);
   }
 
   List<LiveStream> liveChannels() {
