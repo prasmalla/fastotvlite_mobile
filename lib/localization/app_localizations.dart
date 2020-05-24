@@ -11,6 +11,7 @@ const SUPPORTED_LANGUAGES = ['English', 'Русский', 'Français'];
 
 class AppLocalizations {
   Locale _locale = defaultLocale();
+  Map<String, String> _localizedStrings;
 
   AppLocalizations();
 
@@ -31,13 +32,14 @@ class AppLocalizations {
     return _output;
   }
 
-  Map<String, String> _localizedStrings;
-
   Locale currentLocale() {
     return _locale;
   }
 
   Future<bool> load(Locale locale) async {
+    if (locale == null) {
+      return false;
+    }
     // Load the language JSON file from the "lang" folder
     String jsonString = await rootBundle.loadString('install/lang/${locale.languageCode}.json');
     Map<String, dynamic> jsonMap = json.decode(jsonString);
@@ -82,8 +84,11 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 
   @override
   Future<AppLocalizations> load(Locale locale) async {
+    if (locale == null) {
+      locale = AppLocalizations.defaultLocale();
+    }
     // AppLocalizations class is where the JSON loading actually runs
-    AppLocalizations localizations = new AppLocalizations();
+    AppLocalizations localizations = AppLocalizations();
     await localizations.load(locale);
     return localizations;
   }
