@@ -1,6 +1,12 @@
-import 'package:fastotv_common/base/controls/no_channels.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/tv/key_code.dart';
+import 'package:fastotv_common/base/controls/no_channels.dart';
+
+import 'package:flutter_fastotv_common/base/vods/vod_card.dart';
+
 import 'package:fastotvlite/base/stream_parser.dart';
 import 'package:fastotvlite/base/vods/vod_card_favorite_pos.dart';
 import 'package:fastotvlite/base/vods/vod_cards_page.dart';
@@ -8,9 +14,6 @@ import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/tv/vods/tv_vod_description.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_fastotv_common/base/vods/vod_card.dart';
 
 class TVVodPage extends StatefulWidget {
   final Key key;
@@ -23,15 +26,10 @@ class TVVodPage extends StatefulWidget {
 }
 
 class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
-  static const CARD_EDGE_INSETS = 8.0;
   static const EDGE_INSETS = 4.0;
-  static const CARD_HEIGHT = CARD_WIDTH / 2 * 3;
   static const BORDER_WIDTH = 6.0;
-  static const SCROLL_EXTENT = CARD_HEIGHT + BORDER_WIDTH * 2 + CARD_EDGE_INSETS;
 
   static const TABBAR_FONT_SIZE = 24.0;
-  static const TABBAR_HEIGHT = TABBAR_FONT_SIZE * 3;
-  static const ICON_SIZE = TABBAR_FONT_SIZE * 1.2;
 
   Map<String, List<VodStream>> channelsMap = {};
 

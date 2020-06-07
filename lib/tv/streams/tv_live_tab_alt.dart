@@ -1,9 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:fastotv_dart/commands_info/programme_info.dart';
+
 import 'package:fastotv_common/base/controls/favorite_button.dart';
 import 'package:fastotv_common/base/controls/no_channels.dart';
-import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/scroll_controller_manager.dart';
 import 'package:fastotv_common/tv/key_code.dart';
-import 'package:fastotv_dart/commands_info/programme_info.dart';
+import 'package:fastotv_common/colors.dart';
+
+import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
+
 import 'package:fastotvlite/base/icon.dart';
 import 'package:fastotvlite/base/stream_parser.dart';
 import 'package:fastotvlite/base/streams/live_timeline.dart';
@@ -22,9 +29,7 @@ import 'package:fastotvlite/service_locator.dart';
 import 'package:fastotvlite/shared_prefs.dart';
 import 'package:fastotvlite/tv/streams/tv_live_edit_channel.dart';
 import 'package:fastotvlite/tv/tv_tabs.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
+
 
 class ChannelsTabHomeTV extends StatefulWidget {
   final List<LiveStream> channels;
