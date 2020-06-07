@@ -68,7 +68,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
       final live = TR_LIVE_TV;
       _tabNodes.add(live);
 
-      _typesTabView.add(ChannelsTabHomeTValt(_channels));
+      _typesTabView.add(ChannelsTabHomeTV(_channels));
 
       if (isSaved) {
         for (int i = 0; i < _channels.length; i++) {
@@ -105,7 +105,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
     if (widget.privateChannels.isNotEmpty) {
       final priv = TR_PRIVATE_TV;
       _tabNodes.add(priv);
-      _typesTabView.add(ChannelsTabHomeTValt(_channels));
+      _typesTabView.add(ChannelsTabHomeTV(_channels));
       if (isSaved && lastType == null) {
         for (int i = 0; i < widget.privateChannels.length; i++) {
           if (widget.privateChannels[i].id() == lastChannel) {
@@ -264,7 +264,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   void _addLiveStreams(List<LiveStream> streams) {
     if (!_tabNodes.contains(TR_LIVE_TV)) {
       _tabNodes.insert(0, TR_LIVE_TV);
-      _typesTabView.insert(0, ChannelsTabHomeTValt(_channels));
+      _typesTabView.insert(0, ChannelsTabHomeTV(_channels));
       _initTabController();
       _currentType = _tabNodes.length;
     }

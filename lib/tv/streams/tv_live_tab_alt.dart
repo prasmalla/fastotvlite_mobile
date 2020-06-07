@@ -26,18 +26,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
 
-class ChannelsTabHomeTValt extends StatefulWidget {
+class ChannelsTabHomeTV extends StatefulWidget {
   final List<LiveStream> channels;
 
-  ChannelsTabHomeTValt(this.channels);
+  ChannelsTabHomeTV(this.channels);
 
   @override
-  _ChannelsTabHomeTValtState createState() {
-    return _ChannelsTabHomeTValtState();
+  _ChannelsTabHomeTVState createState() {
+    return _ChannelsTabHomeTVState();
   }
 }
 
-class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
+class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
   static const LIST_ITEM_SIZE = 64.0;
   static const LIST_HEADER_SIZE = 32.0;
 
