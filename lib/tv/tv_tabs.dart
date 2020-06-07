@@ -42,11 +42,6 @@ class HomeTV extends StatefulWidget {
 const TABBAR_HEIGHT = 72;
 
 class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsBindingObserver {
-  StreamController<NotificationType> channelsStreamController = StreamController<NotificationType>.broadcast();
-  StreamController<NotificationType> vodsStreamController = StreamController<NotificationType>.broadcast();
-  StreamController<NotificationType> seriesStreamController = StreamController<NotificationType>.broadcast();
-  StreamController<NotificationType> privateChannelsStreamController = StreamController<NotificationType>.broadcast();
-
   final List<String> _tabNodes = [];
   List<Widget> _typesTabView = [];
 
@@ -73,7 +68,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
       final live = TR_LIVE_TV;
       _tabNodes.add(live);
 
-      _typesTabView.add(ChannelsTabHomeTValt(_channels, privateChannelsStreamController));
+      _typesTabView.add(ChannelsTabHomeTValt(_channels));
 
       if (isSaved) {
         for (int i = 0; i < _channels.length; i++) {
@@ -110,7 +105,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
     if (widget.privateChannels.isNotEmpty) {
       final priv = TR_PRIVATE_TV;
       _tabNodes.add(priv);
-      _typesTabView.add(ChannelsTabHomeTValt(_channels, privateChannelsStreamController));
+      _typesTabView.add(ChannelsTabHomeTValt(_channels));
       if (isSaved && lastType == null) {
         for (int i = 0; i < widget.privateChannels.length; i++) {
           if (widget.privateChannels[i].id() == lastChannel) {
@@ -212,6 +207,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
                                     tabs: List<_Tab>.generate(_tabNodes.length, (int index) => _Tab(_tabNodes[index])))
                               ]),
                               actions: <Widget>[
+                                CustomIcons(Icons.search, _onSearch),
                                 CustomIcons(Icons.add_circle, () => _onAdd()),
                                 CustomIcons(Icons.settings, () => _toSettings()),
                                 CustomIcons(Icons.power_settings_new, () => _showExitDialog()),
@@ -232,13 +228,16 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
       builder: (context, snapshot) => Clock.full(width: 108, textColor: color, hour24: snapshot.data.hour24));
   }
 
+  void _onSearch() {
+    //
+  }
+
   void _toSettings() async {
-    channelsStreamController.add(NotificationType.TO_SETTINGS);
+    final tvTabsEvents = locator<TvTabsEvents>();
+    tvTabsEvents.publish(OpenedTvSettings(true));
     double padding = await Navigator.push(context, MaterialPageRoute(builder: (context) => SettingPageTV()));
-    channelsStreamController.add(NotificationType.EXIT_SETTINGS);
-    setState(() {
-      _scale = padding;
-    });
+    tvTabsEvents.publish(OpenedTvSettings(false));
+    setState(() => _scale = padding);
   }
 
   void _onAdd() async {
@@ -265,7 +264,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   void _addLiveStreams(List<LiveStream> streams) {
     if (!_tabNodes.contains(TR_LIVE_TV)) {
       _tabNodes.insert(0, TR_LIVE_TV);
-      _typesTabView.insert(0, ChannelsTabHomeTValt(_channels, privateChannelsStreamController));
+      _typesTabView.insert(0, ChannelsTabHomeTValt(_channels));
       _initTabController();
       _currentType = _tabNodes.length;
     }

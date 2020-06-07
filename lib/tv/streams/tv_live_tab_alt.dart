@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:fastotv_common/base/controls/favorite_button.dart';
 import 'package:fastotv_common/base/controls/no_channels.dart';
 import 'package:fastotv_common/colors.dart';
@@ -15,6 +13,7 @@ import 'package:fastotvlite/base/streams/programs_list.dart';
 import 'package:fastotvlite/channels/live_stream.dart';
 import 'package:fastotvlite/events/ascending.dart';
 import 'package:fastotvlite/events/stream_list_events.dart';
+import 'package:fastotvlite/events/tv_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/notification.dart';
@@ -29,9 +28,8 @@ import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
 
 class ChannelsTabHomeTValt extends StatefulWidget {
   final List<LiveStream> channels;
-  final StreamController<NotificationType> stream;
 
-  ChannelsTabHomeTValt(this.channels, this.stream);
+  ChannelsTabHomeTValt(this.channels);
 
   @override
   _ChannelsTabHomeTValtState createState() {
@@ -79,7 +77,8 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
     final settings = locator<LocalStorageService>();
     scale = settings.screenScale();
     _parseChannels();
-    widget.stream.stream.asBroadcastStream().listen((command) => controlFromTabs(command));
+    final tvTabsEvent = locator<TvTabsEvents>();
+    tvTabsEvent.subscribe<OpenedTvSettings>().listen((event) => controlFromTabs(event.value));
     _playing = _currentChannels[0];
     _initPlayerPage(_playing);
     _initProgramsBloc(_playing);
@@ -167,19 +166,12 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
 
   Color selectedColor(FocusNode focus) => focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
 
-  void controlFromTabs(NotificationType command) {
-    if (context != null) {
-      switch (command) {
-        case NotificationType.TO_SETTINGS:
-          _playerPage.pause();
-          break;
-        case NotificationType.EXIT_SETTINGS:
-          _playerPage.playChannel(_playing);
-          break;
-        default:
-          break;
-      }
-    }
+  void controlFromTabs(bool settingsOpened) {
+    if (settingsOpened) {
+      _playerPage.pause();
+    } else {
+      _playerPage.playChannel(_playing);
+    } 
   }
 
   // init
