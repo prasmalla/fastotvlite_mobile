@@ -11,6 +11,8 @@ abstract class AbstractLiveEditPage extends StatefulWidget {
 }
 
 abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEditPage> {
+  static const int DEFAULT_IARC = 18;
+
   String appBarTitle() => 'Edit channel';
 
   LiveStream stream() => widget.stream;
@@ -66,7 +68,7 @@ abstract class AbstractLiveEditPageState extends EditStreamPageTV<AbstractLiveEd
     widget.stream.setDisplayName(nameController.text);
     widget.stream.setPrimaryUrl(videoLinkController.text);
     widget.stream.setIcon(iconController.text);
-    widget.stream.setIarc(int.tryParse(iarcController.text) ?? 21);
+    widget.stream.setIarc(int.tryParse(iarcController.text) ?? DEFAULT_IARC);
   }
 }
 
