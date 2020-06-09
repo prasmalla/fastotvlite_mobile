@@ -12,6 +12,8 @@ abstract class _AbstractLiveEditPage extends StatefulWidget {
 }
 
 abstract class _AbstractLiveEditPageState extends EditStreamPageState<_AbstractLiveEditPage> {
+  static const int DEFAULT_IARC = 18;
+
   TextEditingController descriptionController;
   TextEditingController nameController;
   TextEditingController iconController;
@@ -36,7 +38,7 @@ abstract class _AbstractLiveEditPageState extends EditStreamPageState<_AbstractL
     widget.stream.setDisplayName(nameController.text);
     widget.stream.setPrimaryUrl(videoLinkController.text);
     widget.stream.setIcon(iconController.text);
-    widget.stream.setIarc(int.tryParse(iarcController.text) ?? 21);
+    widget.stream.setIarc(int.tryParse(iarcController.text) ?? DEFAULT_IARC);
     widget.stream.setGroups(groups);
     widget.stream.setId(idController.text);
   }

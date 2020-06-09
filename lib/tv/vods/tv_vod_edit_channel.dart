@@ -11,6 +11,7 @@ abstract class AbstractVodEditPage extends StatefulWidget {
 }
 
 abstract class AbstractVodEditPageState extends EditStreamPageTV<AbstractVodEditPage> {
+  static const int DEFAULT_IARC = 18;
   String appBarTitle() => 'Edit channel';
 
   VodStream stream() => widget.stream;
@@ -64,7 +65,7 @@ abstract class AbstractVodEditPageState extends EditStreamPageTV<AbstractVodEdit
     widget.stream.setDisplayName(nameController.text);
     widget.stream.setPrimaryUrl(videoLinkController.text);
     widget.stream.setIcon(iconController.text);
-    widget.stream.setIarc(int.tryParse(iarcController.text) ?? 21);
+    widget.stream.setIarc(int.tryParse(iarcController.text) ?? DEFAULT_IARC);
   }
 }
 
