@@ -30,7 +30,6 @@ import 'package:fastotvlite/shared_prefs.dart';
 import 'package:fastotvlite/tv/streams/tv_live_edit_channel.dart';
 import 'package:fastotvlite/tv/tv_tabs.dart';
 
-
 class ChannelsTabHomeTV extends StatefulWidget {
   final List<LiveStream> channels;
 
@@ -82,8 +81,11 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
     final settings = locator<LocalStorageService>();
     scale = settings.screenScale();
     _parseChannels();
+
     final tvTabsEvent = locator<TvTabsEvents>();
     tvTabsEvent.subscribe<OpenedTvSettings>().listen((event) => controlFromTabs(event.value));
+    tvTabsEvent.subscribe<TvSearchEvent>().listen((event) => _onSearch(event.stream));
+    
     _playing = _currentChannels[0];
     _initPlayerPage(_playing);
     _initProgramsBloc(_playing);
@@ -285,6 +287,22 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
     }
   }
 
+  // search
+  void _onSearch(LiveStream stream) {
+    for (int i = 0; i < channelsMap[TR_ALL].length; i++) {
+      final s = channelsMap[TR_ALL][i];
+      if (s.displayName() == stream.displayName()) {
+        _currentCategory = _categories[_categories.indexOf(TR_ALL)];
+        if (_channelsController.controller.hasClients) {
+          _channelsController.moveToPosition(i);
+        }
+        setState(() {});
+        _playChannel(i);
+        break;
+      }
+    }
+  }
+
   // favorite
   void _addFavorite(LiveStream channel) {
     channelsMap[TR_FAVORITE].insert(0, channel);
@@ -436,7 +454,6 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
 
           case ENTER:
           case KEY_CENTER:
-          case KEY_DOWN:
             _playChannel(index);
             break;
 

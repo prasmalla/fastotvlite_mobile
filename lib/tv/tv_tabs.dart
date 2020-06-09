@@ -4,9 +4,11 @@ import 'package:fastotv_common/base/controls/logo.dart';
 import 'package:fastotv_common/clock.dart';
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/screen_orientation.dart' as orientation;
+import 'package:fastotv_common/tv/key_code.dart';
 import 'package:fastotvlite/base/add_streams/add_stream_dialog.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
 import 'package:fastotvlite/base/icon.dart';
+import 'package:fastotvlite/base/login/textfields.dart';
 import 'package:fastotvlite/channels/istream.dart';
 import 'package:fastotvlite/channels/live_stream.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
@@ -22,10 +24,12 @@ import 'package:fastotvlite/shared_prefs.dart';
 import 'package:fastotvlite/tv/add_streams/tv_add_stream_dialog.dart';
 import 'package:fastotvlite/tv/add_streams/tv_stream_quantity.dart';
 import 'package:fastotvlite/tv/exit_dialog.dart';
+import 'package:fastotvlite/tv/search_page.dart';
 import 'package:fastotvlite/tv/settings/tv_settings_page.dart';
 import 'package:fastotvlite/tv/streams/tv_live_tab_alt.dart';
 import 'package:fastotvlite/tv/vods/tv_vod_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class HomeTV extends StatefulWidget {
   final List<LiveStream> channels;
@@ -51,6 +55,8 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   TabController _tabController;
   int _currentType = 0;
   bool isVisible = true;
+
+  Widget _homeWidget;
 
   double _scale;
 
@@ -141,6 +147,8 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
     _currentType = _initTypes();
 
     _initTabController();
+
+    _homeWidget = _home();
   }
 
   @override
@@ -173,12 +181,6 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
 
   @override
   Widget build(BuildContext context) {
-    Widget _home() {
-      return _tabController.length > 0
-          ? TabBarView(key: UniqueKey(), controller: _tabController, children: _typesTabView)
-          : Center(child: Text(AppLocalizations.of(context).translate(TR_NO_STREAMS), style: TextStyle(fontSize: 24)));
-    }
-
     return WillPopScope(
         onWillPop: () async => false,
         child: NotificationListener<TvChannelNotification>(
@@ -207,14 +209,20 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
                                     tabs: List<_Tab>.generate(_tabNodes.length, (int index) => _Tab(_tabNodes[index])))
                               ]),
                               actions: <Widget>[
-                                CustomIcons(Icons.search, _onSearch),
+                                CustomIcons(Icons.search, () => _onSearch()),
                                 CustomIcons(Icons.add_circle, () => _onAdd()),
                                 CustomIcons(Icons.settings, () => _toSettings()),
                                 CustomIcons(Icons.power_settings_new, () => _showExitDialog()),
                                 _clock()
                               ])),
-                      Expanded(child: _home())
+                      Expanded(child: _homeWidget)
                     ])))));
+  }
+
+  Widget _home() {
+    return _tabController.length > 0
+        ? TabBarView(key: UniqueKey(), controller: _tabController, children: _typesTabView)
+        : Center(child: Text(AppLocalizations.of(context).translate(TR_NO_STREAMS), style: TextStyle(fontSize: 24)));
   }
 
   Widget _clock() {
@@ -228,8 +236,12 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
       builder: (context, snapshot) => Clock.full(width: 108, textColor: color, hour24: snapshot.data.hour24));
   }
 
-  void _onSearch() {
-    //
+  void _onSearch() async {
+    IStream stream = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(_channels)));
+    if (stream != null) {
+      final tvTabsEvents = locator<TvTabsEvents>();
+      tvTabsEvents.publish(TvSearchEvent(stream));
+    }
   }
 
   void _toSettings() async {
@@ -256,7 +268,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
         }
       }
       if (mounted) {
-        setState(() {});
+        setState(() => _homeWidget = _home());
       }
     }
   }
@@ -330,7 +342,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
       _tabNodes.removeAt(_currentType);
     }
     _initTabController();
-    setState(() {});
+    setState(() => _homeWidget = _home());
   }
 }
 
