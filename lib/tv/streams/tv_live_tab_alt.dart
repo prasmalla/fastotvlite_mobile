@@ -1,11 +1,16 @@
-import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:fastotv_dart/commands_info/programme_info.dart';
 
 import 'package:fastotv_common/base/controls/favorite_button.dart';
 import 'package:fastotv_common/base/controls/no_channels.dart';
-import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/scroll_controller_manager.dart';
 import 'package:fastotv_common/tv/key_code.dart';
-import 'package:fastotv_dart/commands_info/programme_info.dart';
+import 'package:fastotv_common/colors.dart';
+
+import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
+
 import 'package:fastotvlite/base/icon.dart';
 import 'package:fastotvlite/base/stream_parser.dart';
 import 'package:fastotvlite/base/streams/live_timeline.dart';
@@ -15,6 +20,7 @@ import 'package:fastotvlite/base/streams/programs_list.dart';
 import 'package:fastotvlite/channels/live_stream.dart';
 import 'package:fastotvlite/events/ascending.dart';
 import 'package:fastotvlite/events/stream_list_events.dart';
+import 'package:fastotvlite/events/tv_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/notification.dart';
@@ -23,23 +29,19 @@ import 'package:fastotvlite/service_locator.dart';
 import 'package:fastotvlite/shared_prefs.dart';
 import 'package:fastotvlite/tv/streams/tv_live_edit_channel.dart';
 import 'package:fastotvlite/tv/tv_tabs.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
 
-class ChannelsTabHomeTValt extends StatefulWidget {
+class ChannelsTabHomeTV extends StatefulWidget {
   final List<LiveStream> channels;
-  final StreamController<NotificationType> stream;
 
-  ChannelsTabHomeTValt(this.channels, this.stream);
+  ChannelsTabHomeTV(this.channels);
 
   @override
-  _ChannelsTabHomeTValtState createState() {
-    return _ChannelsTabHomeTValtState();
+  _ChannelsTabHomeTVState createState() {
+    return _ChannelsTabHomeTVState();
   }
 }
 
-class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
+class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
   static const LIST_ITEM_SIZE = 64.0;
   static const LIST_HEADER_SIZE = 32.0;
 
@@ -79,7 +81,11 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
     final settings = locator<LocalStorageService>();
     scale = settings.screenScale();
     _parseChannels();
-    widget.stream.stream.asBroadcastStream().listen((command) => controlFromTabs(command));
+
+    final tvTabsEvent = locator<TvTabsEvents>();
+    tvTabsEvent.subscribe<OpenedTvSettings>().listen((event) => controlFromTabs(event.value));
+    tvTabsEvent.subscribe<TvSearchEvent>().listen((event) => _onSearch(event.stream));
+    
     _playing = _currentChannels[0];
     _initPlayerPage(_playing);
     _initProgramsBloc(_playing);
@@ -167,19 +173,12 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
 
   Color selectedColor(FocusNode focus) => focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
 
-  void controlFromTabs(NotificationType command) {
-    if (context != null) {
-      switch (command) {
-        case NotificationType.TO_SETTINGS:
-          _playerPage.pause();
-          break;
-        case NotificationType.EXIT_SETTINGS:
-          _playerPage.playChannel(_playing);
-          break;
-        default:
-          break;
-      }
-    }
+  void controlFromTabs(bool settingsOpened) {
+    if (settingsOpened) {
+      _playerPage.pause();
+    } else {
+      _playerPage.playChannel(_playing);
+    } 
   }
 
   // init
@@ -285,6 +284,22 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
       });
     } else {
       Scaffold.of(context).hideCurrentSnackBar();
+    }
+  }
+
+  // search
+  void _onSearch(LiveStream stream) {
+    for (int i = 0; i < channelsMap[TR_ALL].length; i++) {
+      final s = channelsMap[TR_ALL][i];
+      if (s.displayName() == stream.displayName()) {
+        _currentCategory = _categories[_categories.indexOf(TR_ALL)];
+        if (_channelsController.controller.hasClients) {
+          _channelsController.moveToPosition(i);
+        }
+        setState(() {});
+        _playChannel(i);
+        break;
+      }
     }
   }
 
@@ -439,7 +454,6 @@ class _ChannelsTabHomeTValtState extends State<ChannelsTabHomeTValt> {
 
           case ENTER:
           case KEY_CENTER:
-          case KEY_DOWN:
             _playChannel(index);
             break;
 
