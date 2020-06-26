@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fastotv_common/base/controls/custom_appbar.dart';
 import 'package:flutter_fastotv_common/chromecast/chromecast_filler.dart';
 import 'package:flutter_fastotv_common/chromecast/chromecast_info.dart';
-import 'package:video_player/video_player.dart';
 
 class VodPlayer extends StatefulWidget {
   final VodStream channel;
@@ -91,7 +90,7 @@ class VodPlayerPageMobileState extends AppBarPlayerVod<VodPlayer> {
   Widget timeLine() {
     return ChromeCastInfo().castConnected
         ? SizedBox()
-        : VideoProgressIndicator(_vodPlayerPage.controller(), allowScrubbing: true);
+        : _vodPlayerPage.timeLine();
   }
 
   @override
