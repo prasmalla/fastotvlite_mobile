@@ -58,7 +58,6 @@ class EpgDialog extends StatefulWidget {
 class _EpgDialogState extends State<EpgDialog> {
   String _epgLink = EPG_URL;
   String password = '';
-  static const ITEM_HEIGHT = 48.0;
   TextEditingController _textEditingController = TextEditingController();
   final reg = RegExp('^http([s]{0,1})://([!-~]+)/');
   bool validator = true;

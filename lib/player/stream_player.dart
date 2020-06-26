@@ -13,6 +13,9 @@ class LiteStreamPlayer<T extends StatefulWidget> extends LitePlayer<T> {
   void onPlaying(dynamic userData) {}
 
   @override
+  void onPlayingError(dynamic userData) {}
+
+  @override
   void initState() {
     super.initState();
   }

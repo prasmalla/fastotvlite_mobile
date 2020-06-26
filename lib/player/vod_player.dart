@@ -1,7 +1,6 @@
 import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fastotv_common/player/player.dart';
-import 'package:video_player/video_player.dart';
 
 class LiteVodPlayer<T extends StatefulWidget> extends LitePlayer<T> {
   VodStream channel;
@@ -12,6 +11,9 @@ class LiteVodPlayer<T extends StatefulWidget> extends LitePlayer<T> {
 
   @override
   void onPlaying(dynamic userData) {}
+
+  @override
+  void onPlayingError(dynamic userData) {}
 
   @override
   void seekToInterrupt() {
@@ -61,8 +63,10 @@ class VodPlayerPage extends StatefulWidget {
   void seekBackward(Duration duration) {
     _player.seekBackward(duration);
   }
-
-  VideoPlayerController controller() => _player.controller();
+  
+  Widget timeLine() {
+    return _player.timeLine();
+  }
 
   Duration position() => _player.position();
 
@@ -83,6 +87,9 @@ class LiteTrailerPlayer<T extends StatefulWidget> extends LitePlayer<T> {
 
   @override
   void onPlaying(dynamic userData) {}
+  
+  @override
+  void onPlayingError(dynamic userData) {}
 
   @override
   void initState() {
@@ -115,7 +122,9 @@ class TrailerPlayerPage extends StatefulWidget {
     _player.seekBackward(duration);
   }
 
-  VideoPlayerController controller() => _player.controller();
+  Widget timeLine() {
+    return _player.timeLine();
+  }
 
   Duration position() => _player.position();
 
