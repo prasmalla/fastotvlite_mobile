@@ -39,6 +39,11 @@ class HomePage extends StatefulWidget {
 
 class VideoAppState<C extends IStream> extends State<HomePage> with TickerProviderStateMixin, WidgetsBindingObserver {
   VideoAppState();
+  
+  GlobalKey _liveKey = GlobalKey();
+  GlobalKey _catchupsKey = GlobalKey();
+  GlobalKey _vodKey = GlobalKey();
+  GlobalKey _seriesKey = GlobalKey();
 
   List<LiveStream> _channels = [];
   List<VodStream> _vods = [];
@@ -118,9 +123,9 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
   Widget _getCurrentTabWidget() {
     switch (_selectedType) {
       case TR_LIVE_TV:
-        return LiveTab(GlobalKey(), _channels);
+        return LiveTab(_liveKey, _channels);
       case TR_VODS:
-        return VodTab(GlobalKey(), _vods);
+        return VodTab(_vodKey, _vods);
       case TR_SERIES:
         return VodTab(GlobalKey(), widget.series);
       case TR_PRIVATE_TV:
