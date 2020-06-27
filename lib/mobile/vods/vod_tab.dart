@@ -2,16 +2,30 @@ import 'package:fastotv_common/base/controls/favorite_button.dart';
 import 'package:fastotvlite/base/vods/constants.dart';
 import 'package:fastotvlite/base/vods/vod_card_favorite_pos.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
+import 'package:fastotvlite/events/search_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/mobile/base_tab.dart';
 import 'package:fastotvlite/mobile/vods/movie_desc.dart';
 import 'package:fastotvlite/mobile/vods/vod_edit_channel.dart';
 import 'package:fastotvlite/mobile/vods/vod_player_page.dart';
+import 'package:fastotvlite/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fastotv_common/base/vods/vod_card.dart';
 
+class VodTab extends BaseListTab<VodStream> {
+  VodTab(key, channels) : super(key, channels);
+
+  @override
+  VodVideoAppState createState() => VodVideoAppState();
+}
+
 class VodVideoAppState extends VideoAppState<VodStream> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   String noRecent() => AppLocalizations.of(context).translate(TR_RECENT_LIVE);
 
   String noFavorite() => AppLocalizations.of(context).translate(TR_FAVORITE_LIVE);
@@ -75,6 +89,10 @@ class VodVideoAppState extends VideoAppState<VodStream> {
                 itemBuilder: (BuildContext context, int index) => tile(index, channels))));
   }
 
+  void onSearch(VodStream stream) {
+    toDescription(stream);
+  }
+
   void onTapped(List<VodStream> channels, int position) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => VodPlayer(channels[position])));
   }
@@ -85,11 +103,4 @@ class VodVideoAppState extends VideoAppState<VodStream> {
     if (channel.favorite() != prevFav) handleFavorite(channel.favorite(), channel);
     addRecent(channel);
   }
-}
-
-class VodTab extends BaseListTab<VodStream> {
-  VodTab(key, channels, searchTexts) : super(key, channels, searchTexts);
-
-  @override
-  VodVideoAppState createState() => VodVideoAppState();
 }

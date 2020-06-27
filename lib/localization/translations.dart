@@ -25,6 +25,9 @@ const String TR_PRIVATE_TV = 'PrivateTV';
 const String TR_SETTINGS = 'Settings';
 const String TR_ABOUT = 'About';
 const String TR_EMPTY = 'Empty';
+const String TR_SEARCH_LIVE = "Search live";
+const String TR_SEARCH_VOD = "Search vod";
+const String TR_SEARCH_EMPTY = "Search empty";
 
 const String TR_PLAYER = "Player";
 const String TR_LAST_VIEWED = "Last viewed";

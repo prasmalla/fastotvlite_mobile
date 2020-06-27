@@ -26,6 +26,9 @@
   "Empty": "Empty",
   "Settings": "Settings",
   "About": "About",
+  "Search live": "Search in channels",
+  "Search vod": "Search in VODs",
+  "Search empty": "Nothing found",
 
   "Player": "Player",
   "Last viewed": "Last viewed",

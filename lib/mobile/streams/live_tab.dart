@@ -3,6 +3,7 @@ import 'dart:core';
 
 import 'package:fastotv_common/screen_orientation.dart' as orientation;
 import 'package:fastotvlite/channels/live_stream.dart';
+import 'package:fastotvlite/events/search_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/mobile/base_tab.dart';
@@ -13,7 +14,7 @@ import 'package:fastotvlite/shared_prefs.dart';
 import 'package:flutter/material.dart';
 
 class LiveTab extends BaseListTab<LiveStream> {
-  LiveTab(key, channels, searchText) : super(key, channels, searchText);
+  LiveTab(key, channels) : super(key, channels);
 
   @override
   LiveVideoAppState createState() => LiveVideoAppState();
@@ -51,10 +52,12 @@ class LiveVideoAppState extends VideoAppState<LiveStream> with ILiveFutureTileOb
         separatorBuilder: (context, int index) => Divider(height: 0),
         itemCount: channels.length,
         itemBuilder: (context, index) {
-          return Visibility(
-              visible: splitInWords(channels[index].displayName()),
-              child: LiveFutureTile(channels: channels, index: index, observer: this));
+          return LiveFutureTile(channels: channels, index: index, observer: this);
         });
+  }
+
+  void onSearch(LiveStream stream) {
+    onTap([stream], 0);
   }
 
   void onTapped(List<LiveStream> channels, int position) async {

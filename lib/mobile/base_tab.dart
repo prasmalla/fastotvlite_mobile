@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:fastotv_common/base/controls/no_channels.dart';
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotvlite/base/stream_parser.dart';
 import 'package:fastotvlite/channels/istream.dart';
 import 'package:fastotvlite/events/ascending.dart';
 import 'package:fastotvlite/events/descending.dart';
+import 'package:fastotvlite/events/search_events.dart';
 import 'package:fastotvlite/events/stream_list_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
@@ -17,20 +16,20 @@ const TAB_BAR_HEIGHT = 46.0;
 abstract class BaseListTab<T extends IStream> extends StatefulWidget {
   final Key key;
   final List<T> channels;
-  final StreamController<String> textSearch;
 
-  BaseListTab(this.key, this.channels, this.textSearch);
+  BaseListTab(this.key, this.channels);
 }
 
 abstract class VideoAppState<T extends IStream> extends State<BaseListTab> with TickerProviderStateMixin {
   TabController tabController;
   Map<String, List<T>> channelsMap = {};
   bool tabsVisibility = true;
-  String _searchRequest = '';
 
   String noRecent();
 
   String noFavorite();
+
+  void onSearch(T stream);
 
   @override
   void initState() {
@@ -39,12 +38,16 @@ abstract class VideoAppState<T extends IStream> extends State<BaseListTab> with 
     parseChannels();
     initTabController();
 
+    final _search = locator<SearchEvents>();
+    _search.subscribe<SearchEvent<T>>().listen((event) {
+      onSearch(event.stream);
+    });
+
     final events = locator<StreamListEvent>();
     events.subscribe<StreamsAddedEvent>().listen((_) {
       parseChannels();
       initTabController();
     });
-    widget.textSearch.stream.asBroadcastStream().listen((command) => obeySearch(command));
   }
 
   @override
@@ -60,40 +63,6 @@ abstract class VideoAppState<T extends IStream> extends State<BaseListTab> with 
               height: MediaQuery.of(context).size.height,
               child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: columnChildren)));
     });
-  }
-
-  /// Search
-  void obeySearch(String searchText) {
-    if (context != null) {
-      switch (searchText) {
-        case 'ON':
-          tabsVisibility = false;
-          _searchRequest = '';
-          break;
-        case 'OFF':
-          tabsVisibility = true;
-          _searchRequest = '';
-          break;
-        default:
-          _searchRequest = searchText;
-          break;
-      }
-      setState(() {});
-    }
-  }
-
-  bool splitInWords(String name) {
-    List<String> categ = [];
-    bool contains = true;
-    String request = _searchRequest.toLowerCase();
-    request.contains(" ") ? categ = request.split(" ") : categ.add(request);
-    categ.forEach((word) {
-      if (!AppLocalizations.toUtf8(name).toLowerCase().contains(word)) {
-        contains = false;
-      }
-    });
-
-    return contains;
   }
 
   /// Splits channel list by groups
