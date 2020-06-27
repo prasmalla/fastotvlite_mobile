@@ -1,4 +1,5 @@
 import 'package:fastotv_common/base/controls/favorite_button.dart';
+import 'package:fastotvlite/base/vods/constants.dart';
 import 'package:fastotvlite/base/vods/vod_card_favorite_pos.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
@@ -11,9 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fastotv_common/base/vods/vod_card.dart';
 
 class VodVideoAppState extends VideoAppState<VodStream> {
-  static const EDGE_INSETS = 4.0;
-  static const CARD_WIDTH = 168.0;
-
   String noRecent() => AppLocalizations.of(context).translate(TR_RECENT_LIVE);
 
   String noFavorite() => AppLocalizations.of(context).translate(TR_FAVORITE_LIVE);
