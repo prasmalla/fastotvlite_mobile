@@ -1,4 +1,6 @@
 import 'package:fastotvlite/base/vods/constants.dart';
+import 'package:fastotvlite/events/search_events.dart';
+import 'package:fastotvlite/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -44,6 +46,8 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
     super.initState();
     channelsMap = StreamsParser<VodStream>(widget.channels).parseChannels();
     _initTabController();
+    final _search = locator<SearchEvents>();
+    _search.subscribe<SearchEvent<VodStream>>().listen((event) => _onSearch(event.stream));
   }
 
   @override
@@ -215,6 +219,17 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
       channelsMap[TR_RECENT].sort((b, a) => a.recentTime().compareTo(b.recentTime()));
     } else {
       channelsMap[TR_RECENT].insert(0, channel);
+    }
+  }
+  
+  void _onSearch(VodStream stream) {
+    for (int i = 0; i < channelsMap[TR_ALL].length; i++) {
+      final s = channelsMap[TR_ALL][i];
+      if (s.id() == stream.id()) {
+        currentCategory = 2;
+        _onCardTap(s);
+        break;
+      }
     }
   }
 }

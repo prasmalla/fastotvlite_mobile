@@ -1,5 +1,4 @@
 import 'package:event_bus/event_bus.dart';
-import 'package:fastotvlite/channels/istream.dart';
 
 class TvTabsEvents {
   static Future<TvTabsEvents> getInstance() async {
@@ -32,10 +31,4 @@ class ClockFormatChanged {
   final bool hour24;
 
   ClockFormatChanged(this.hour24);
-}
-
-class TvSearchEvent {
-  final IStream stream;
-
-  TvSearchEvent(this.stream);
 }

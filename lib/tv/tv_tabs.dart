@@ -1,3 +1,4 @@
+import 'package:fastotvlite/events/search_events.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fastotv_common/base/controls/logo.dart';
@@ -54,6 +55,8 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   Widget _homeWidget;
 
   double _scale;
+
+  String get _currentCategory => _tabNodes[_tabController.index];
 
   int _initTypes() {
     if (widget.channels.isEmpty && widget.vods.isEmpty) {
@@ -193,7 +196,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   Widget _home() {
     return _tabController.length > 0
         ? TabBarView(key: UniqueKey(), controller: _tabController, children: _typesTabView)
-        : Center(child: Text(AppLocalizations.of(context).translate(TR_NO_STREAMS), style: TextStyle(fontSize: 24)));
+        : Center(child: Text(TR_NO_STREAMS, style: TextStyle(fontSize: 24)));
   }
 
   Widget _clock() {
@@ -207,11 +210,27 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
       builder: (context, snapshot) => Clock.full(width: 108, textColor: color, hour24: snapshot.data.hour24));
   }
 
-  void _onSearch() async {
-    IStream stream = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(_channels)));
+  void _onSearch() {
+    switch (_currentCategory) {
+      case TR_LIVE_TV:
+        _openSearchPage<LiveStream>(_channels);
+        break;
+      case TR_VODS:
+        _openSearchPage<VodStream>(_vods);
+        break;
+      default:
+        break;
+    }
+  }
+
+  void _openSearchPage<T extends IStream>(List<T> streams) async {
+    final tvTabsEvents = locator<TvTabsEvents>();
+    tvTabsEvents.publish(OpenedTvSettings(true));
+    T stream = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(streams)));
+    tvTabsEvents.publish(OpenedTvSettings(false));
     if (stream != null) {
-      final tvTabsEvents = locator<TvTabsEvents>();
-      tvTabsEvents.publish(TvSearchEvent(stream));
+      final _search = locator<SearchEvents>();
+      _search.publish(SearchEvent<T>(stream));
     }
   }
 
@@ -328,7 +347,7 @@ class _Tab extends StatelessWidget {
         focusNode: FocusNode(),
         autofocus: true,
         child: Tab(
-            child: Text(AppLocalizations.of(context).translate(title),
+            child: Text(title,
                 style: TextStyle(fontSize: 20, color: CustomColor().themeBrightnessColor(context)))));
   }
 }
