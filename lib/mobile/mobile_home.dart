@@ -112,8 +112,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
       return Icons.personal_video;
     } else if (type == TR_VODS) {
       return Icons.ondemand_video;
-    } else if (type == TR_PRIVATE_TV) {
-      return Icons.vpn_key;
     }
     return Icons.warning;
   }
