@@ -28,9 +28,8 @@ import 'package:unicorndial/unicorndial.dart';
 class HomePage extends StatefulWidget {
   final List<LiveStream> channels;
   final List<VodStream> vods;
-  final List<LiveStream> privateChannels;
 
-  HomePage(this.channels, this.vods, this.privateChannels);
+  HomePage(this.channels, this.vods);
 
   @override
   VideoAppState createState() => VideoAppState();
@@ -87,17 +86,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
         }
       }
     }
-    if (widget.privateChannels.isNotEmpty) {
-      final title = TR_PRIVATE_TV;
-      _videoTypesList.add(title);
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.privateChannels.length; i++) {
-          if (widget.privateChannels[i].id() == lastChannel) {
-            lastType = title;
-          }
-        }
-      }
-    }
 
     if (lastType != null && isSaved) {
       _selectedType = _videoTypesList.contains(lastType) ? lastType : _videoTypesList[0];
@@ -112,8 +100,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
         return LiveTab(_liveKey, _channels);
       case TR_VODS:
         return VodTab(_vodKey, _vods);
-      case TR_PRIVATE_TV:
-        return LiveTab(GlobalKey(), widget.privateChannels);
 
       default:
         return Center(

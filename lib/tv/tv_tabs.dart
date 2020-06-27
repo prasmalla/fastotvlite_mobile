@@ -34,9 +34,8 @@ import 'package:flutter/services.dart';
 class HomeTV extends StatefulWidget {
   final List<LiveStream> channels;
   final List<VodStream> vods;
-  final List<LiveStream> privateChannels;
 
-  HomeTV(this.channels, this.vods, this.privateChannels);
+  HomeTV(this.channels, this.vods);
 
   @override
   _HomeTVState createState() => _HomeTVState();
@@ -60,7 +59,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   double _scale;
 
   int _initTypes() {
-    if (widget.channels.isEmpty && widget.vods.isEmpty && widget.privateChannels.isEmpty) {
+    if (widget.channels.isEmpty && widget.vods.isEmpty) {
       return 0;
     }
 
@@ -91,18 +90,6 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
         for (int i = 0; i < _vods.length; i++) {
           if (_vods[i].id() == lastChannel) {
             lastType = 1;
-          }
-        }
-      }
-    }
-    if (widget.privateChannels.isNotEmpty) {
-      final priv = TR_PRIVATE_TV;
-      _tabNodes.add(priv);
-      _typesTabView.add(ChannelsTabHomeTV(_channels));
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.privateChannels.length; i++) {
-          if (widget.privateChannels[i].id() == lastChannel) {
-            lastType = 3;
           }
         }
       }
