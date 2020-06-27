@@ -3,7 +3,6 @@ import 'dart:core';
 
 import 'package:fastotv_common/screen_orientation.dart' as orientation;
 import 'package:fastotvlite/channels/live_stream.dart';
-import 'package:fastotvlite/events/search_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/mobile/base_tab.dart';
@@ -41,10 +40,6 @@ class LiveVideoAppState extends VideoAppState<LiveStream> with ILiveFutureTileOb
   void dispose() {
     super.dispose();
     recentlyViewed.close();
-  }
-
-  Widget tile(int, List<LiveStream> channels) {
-    return LiveFutureTile(channels: channels, index: int, observer: this);
   }
 
   ListView listBuilder(List<LiveStream> channels) {
