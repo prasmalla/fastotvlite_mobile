@@ -1,14 +1,13 @@
-import 'dart:async';
+import 'package:flutter/material.dart';
 
 import 'package:fastotv_common/base/controls/logo.dart';
 import 'package:fastotv_common/clock.dart';
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/screen_orientation.dart' as orientation;
-import 'package:fastotv_common/tv/key_code.dart';
+
 import 'package:fastotvlite/base/add_streams/add_stream_dialog.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
 import 'package:fastotvlite/base/icon.dart';
-import 'package:fastotvlite/base/login/textfields.dart';
 import 'package:fastotvlite/channels/istream.dart';
 import 'package:fastotvlite/channels/live_stream.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
@@ -28,8 +27,6 @@ import 'package:fastotvlite/tv/search_page.dart';
 import 'package:fastotvlite/tv/settings/tv_settings_page.dart';
 import 'package:fastotvlite/tv/streams/tv_live_tab_alt.dart';
 import 'package:fastotvlite/tv/vods/tv_vod_tab.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class HomeTV extends StatefulWidget {
   final List<LiveStream> channels;
