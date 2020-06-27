@@ -225,7 +225,7 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
   void _onSearch(VodStream stream) {
     for (int i = 0; i < channelsMap[TR_ALL].length; i++) {
       final s = channelsMap[TR_ALL][i];
-      if (s.id() == stream.id()) {
+      if (s.displayName() == stream.displayName()) {
         currentCategory = 2;
         _onCardTap(s);
         break;

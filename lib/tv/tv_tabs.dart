@@ -343,11 +343,8 @@ class _Tab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-        focusNode: FocusNode(),
-        autofocus: true,
-        child: Tab(
-            child: Text(title,
-                style: TextStyle(fontSize: 20, color: CustomColor().themeBrightnessColor(context)))));
+    return Tab(
+        child: Text(AppLocalizations.of(context).translate(title),
+            style: TextStyle(fontSize: 20, color: CustomColor().themeBrightnessColor(context))));
   }
 }

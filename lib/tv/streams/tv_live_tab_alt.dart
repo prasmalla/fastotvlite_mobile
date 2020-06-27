@@ -179,11 +179,13 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
   Color selectedColor(FocusNode focus) => focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
 
   void controlFromTabs(bool settingsOpened) {
-    if (settingsOpened) {
-      _playerPage.pause();
-    } else {
-      _playerPage.playChannel(_playing);
-    } 
+    if (mounted) {
+      if (settingsOpened) {
+        _playerPage.pause();
+      } else {
+        _playerPage.playChannel(_playing);
+      } 
+    }
   }
 
   // init
