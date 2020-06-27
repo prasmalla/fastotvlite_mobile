@@ -34,10 +34,9 @@ import 'package:flutter/services.dart';
 class HomeTV extends StatefulWidget {
   final List<LiveStream> channels;
   final List<VodStream> vods;
-  final List<VodStream> series;
   final List<LiveStream> privateChannels;
 
-  HomeTV(this.channels, this.vods, this.series, this.privateChannels);
+  HomeTV(this.channels, this.vods, this.privateChannels);
 
   @override
   _HomeTVState createState() => _HomeTVState();
@@ -61,7 +60,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   double _scale;
 
   int _initTypes() {
-    if (widget.channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty && widget.privateChannels.isEmpty) {
+    if (widget.channels.isEmpty && widget.vods.isEmpty && widget.privateChannels.isEmpty) {
       return 0;
     }
 
@@ -92,18 +91,6 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
         for (int i = 0; i < _vods.length; i++) {
           if (_vods[i].id() == lastChannel) {
             lastType = 1;
-          }
-        }
-      }
-    }
-    if (widget.series.isNotEmpty) {
-      final series = TR_SERIES;
-      _tabNodes.add(series);
-      _typesTabView.add(TVVodPage(widget.series));
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.series.length; i++) {
-          if (widget.series[i].id() == lastChannel) {
-            lastType = 2;
           }
         }
       }
@@ -334,7 +321,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
 
   void _onTypeDelete() {
     _currentType = 0;
-    if (_channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty) {
+    if (_channels.isEmpty && widget.vods.isEmpty) {
       _typesTabView.clear();
       _tabNodes.clear();
     } else {

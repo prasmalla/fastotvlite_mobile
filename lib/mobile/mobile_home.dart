@@ -28,10 +28,9 @@ import 'package:unicorndial/unicorndial.dart';
 class HomePage extends StatefulWidget {
   final List<LiveStream> channels;
   final List<VodStream> vods;
-  final List<VodStream> series;
   final List<LiveStream> privateChannels;
 
-  HomePage(this.channels, this.vods, this.series, this.privateChannels);
+  HomePage(this.channels, this.vods, this.privateChannels);
 
   @override
   VideoAppState createState() => VideoAppState();
@@ -41,9 +40,7 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
   VideoAppState();
   
   GlobalKey _liveKey = GlobalKey();
-  GlobalKey _catchupsKey = GlobalKey();
   GlobalKey _vodKey = GlobalKey();
-  GlobalKey _seriesKey = GlobalKey();
 
   List<LiveStream> _channels = [];
   List<VodStream> _vods = [];
@@ -62,7 +59,7 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
     String lastType;
     String lastChannel = settings.lastChannel();
 
-    if (_channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty) {
+    if (_channels.isEmpty && widget.vods.isEmpty) {
       _selectedType = TR_EMPTY;
       return;
     }
@@ -85,17 +82,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
       if (isSaved && lastType == null) {
         for (int i = 0; i < widget.vods.length; i++) {
           if (widget.vods[i].id() == lastChannel) {
-            lastType = title;
-          }
-        }
-      }
-    }
-    if (widget.series.isNotEmpty) {
-      final title = TR_SERIES;
-      _videoTypesList.add(title);
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.series.length; i++) {
-          if (widget.series[i].id() == lastChannel) {
             lastType = title;
           }
         }
@@ -126,8 +112,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
         return LiveTab(_liveKey, _channels);
       case TR_VODS:
         return VodTab(_vodKey, _vods);
-      case TR_SERIES:
-        return VodTab(GlobalKey(), widget.series);
       case TR_PRIVATE_TV:
         return LiveTab(GlobalKey(), widget.privateChannels);
 
@@ -142,8 +126,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
       return Icons.personal_video;
     } else if (type == TR_VODS) {
       return Icons.ondemand_video;
-    } else if (type == TR_SERIES) {
-      return Icons.video_library;
     } else if (type == TR_PRIVATE_TV) {
       return Icons.vpn_key;
     }
@@ -334,7 +316,7 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
 
   // add/edit streams
   void _onTypeDelete() {
-    if (_channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty) {
+    if (_channels.isEmpty && widget.vods.isEmpty) {
       _selectedType = TR_EMPTY;
       _videoTypesList.clear();
     } else {
