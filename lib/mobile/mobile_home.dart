@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:fastotv_common/base/controls/logo.dart';
 import 'package:fastotv_common/colors.dart';
@@ -11,12 +9,15 @@ import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/constants.dart';
 import 'package:fastotvlite/events/ascending.dart';
 import 'package:fastotvlite/events/descending.dart';
+import 'package:fastotvlite/events/search_events.dart';
 import 'package:fastotvlite/events/stream_list_events.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/mobile/add_streams/add_stream_dialog.dart';
 import 'package:fastotvlite/mobile/settings/settings_page.dart';
+import 'package:fastotvlite/mobile/streams/live_search.dart';
 import 'package:fastotvlite/mobile/streams/live_tab.dart';
+import 'package:fastotvlite/mobile/vods/vod_search.dart';
 import 'package:fastotvlite/mobile/vods/vod_tab.dart';
 import 'package:fastotvlite/service_locator.dart';
 import 'package:fastotvlite/shared_prefs.dart';
@@ -27,10 +28,8 @@ import 'package:unicorndial/unicorndial.dart';
 class HomePage extends StatefulWidget {
   final List<LiveStream> channels;
   final List<VodStream> vods;
-  final List<VodStream> series;
-  final List<LiveStream> privateChannels;
 
-  HomePage(this.channels, this.vods, this.series, this.privateChannels);
+  HomePage(this.channels, this.vods);
 
   @override
   VideoAppState createState() => VideoAppState();
@@ -38,6 +37,9 @@ class HomePage extends StatefulWidget {
 
 class VideoAppState<C extends IStream> extends State<HomePage> with TickerProviderStateMixin, WidgetsBindingObserver {
   VideoAppState();
+  
+  GlobalKey _liveKey = GlobalKey();
+  GlobalKey _vodKey = GlobalKey();
 
   List<LiveStream> _channels = [];
   List<VodStream> _vods = [];
@@ -45,10 +47,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
   List<String> _videoTypesList = [];
   String _selectedType;
-
-  final TextEditingController _filter = new TextEditingController();
-  StreamController<String> searchStream = StreamController<String>.broadcast();
-  IconData _searchIcon = Icons.search;
 
   String _translate(String key) => AppLocalizations.of(context).translate(key);
 
@@ -60,7 +58,7 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
     String lastType;
     String lastChannel = settings.lastChannel();
 
-    if (_channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty) {
+    if (_channels.isEmpty && widget.vods.isEmpty) {
       _selectedType = TR_EMPTY;
       return;
     }
@@ -88,28 +86,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
         }
       }
     }
-    if (widget.series.isNotEmpty) {
-      final title = TR_SERIES;
-      _videoTypesList.add(title);
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.series.length; i++) {
-          if (widget.series[i].id() == lastChannel) {
-            lastType = title;
-          }
-        }
-      }
-    }
-    if (widget.privateChannels.isNotEmpty) {
-      final title = TR_PRIVATE_TV;
-      _videoTypesList.add(title);
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.privateChannels.length; i++) {
-          if (widget.privateChannels[i].id() == lastChannel) {
-            lastType = title;
-          }
-        }
-      }
-    }
 
     if (lastType != null && isSaved) {
       _selectedType = _videoTypesList.contains(lastType) ? lastType : _videoTypesList[0];
@@ -121,13 +97,9 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
   Widget _getCurrentTabWidget() {
     switch (_selectedType) {
       case TR_LIVE_TV:
-        return LiveTab(GlobalKey(), _channels, searchStream);
+        return LiveTab(_liveKey, _channels);
       case TR_VODS:
-        return VodTab(GlobalKey(), _vods, searchStream);
-      case TR_SERIES:
-        return VodTab(GlobalKey(), widget.series, searchStream);
-      case TR_PRIVATE_TV:
-        return LiveTab(GlobalKey(), widget.privateChannels, searchStream);
+        return VodTab(_vodKey, _vods);
 
       default:
         return Center(
@@ -140,10 +112,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
       return Icons.personal_video;
     } else if (type == TR_VODS) {
       return Icons.ondemand_video;
-    } else if (type == TR_SERIES) {
-      return Icons.video_library;
-    } else if (type == TR_PRIVATE_TV) {
-      return Icons.vpn_key;
     }
     return Icons.warning;
   }
@@ -158,9 +126,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
     _channels = widget.channels;
     _vods = widget.vods;
     _fillTypes();
-    _filter.addListener(() {
-      searchStream.add(_filter.text);
-    });
   }
 
   @override
@@ -174,7 +139,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
   void dispose() {
     super.dispose();
     _saveStreams();
-    searchStream.close();
   }
 
   @override
@@ -186,9 +150,6 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
           return Scaffold(
               key: _drawerKey,
               appBar: _appBar(onPrimaryColor),
-
-              /// To prevent opening drawer on swipe, when searchBar is active
-              drawerEdgeDragWidth: _searchIcon == Icons.search ? null : 0,
               drawer: _drawer(),
               body: DoubleBackToCloseApp(
                   snackBar: const SnackBar(content: Text('Tap back again to exit')), child: _getCurrentTabWidget()),
@@ -197,24 +158,27 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
   }
 
   Widget _appBar(Color iconColor) {
-    return AppBar(
-        automaticallyImplyLeading: false,
-        elevation: _selectedType == TR_EMPTY ? 4 : 0,
-        title: _searchIcon == Icons.search
-            ? Text(_translate(_selectedType), style: TextStyle(color: iconColor))
-            : TextField(
-                autofocus: true,
-                controller: _filter,
-                cursorColor: Theme.of(context).accentColor,
-                decoration: InputDecoration(border: InputBorder.none, hintText: _translate(TR_SEARCH))),
+    double _elevation() {
+      if (_selectedType == TR_EMPTY) {
+        return 4;
+      }
+      return 0;
+    }
 
-        /// Swap [Menu] button on [Search] button to prevent drawer opening
-        /// when search is enabled and for visual compliance
-        leading: _searchIcon == Icons.search
-            ? IconButton(
-                icon: Icon(Icons.menu, color: iconColor), onPressed: () => _drawerKey.currentState.openDrawer())
-            : Icon(Icons.search, color: iconColor),
-        actions: <Widget>[IconButton(icon: Icon(_searchIcon, color: iconColor), onPressed: _searchPressed)]);
+    return AppBar(
+        elevation: _elevation(),
+        automaticallyImplyLeading: false,
+        title: Text(_translate(_selectedType), style: TextStyle(color: iconColor)),
+        leading: IconButton(icon: Icon(Icons.menu, color: iconColor), onPressed: () => _drawerKey.currentState.openDrawer()),
+        actions: <Widget>[_search(iconColor)]);
+  }
+
+  Widget _search(Color iconsColor) {
+    if (_selectedType == TR_CATCHUPS) {
+      return SizedBox();
+    }
+
+    return IconButton(icon: Icon(Icons.search, color: iconsColor), onPressed: () => _onSearch());
   }
 
   Widget _drawer() {
@@ -302,22 +266,41 @@ class VideoAppState<C extends IStream> extends State<HomePage> with TickerProvid
         ]);
   }
 
-  void _searchPressed() {
-    setState(() {
-      if (_searchIcon == Icons.search) {
-        searchStream.add('ON');
-        _filter.text = '';
-        _searchIcon = Icons.close;
-      } else {
-        searchStream.add('OFF');
-        _filter.text = '';
-        _searchIcon = Icons.search;
-      }
-    });
+  // search
+  SearchDelegate _searchDelegate() {
+    switch (_selectedType) {
+      case TR_LIVE_TV:
+        return LiveStreamSearch(widget.channels, _translate(TR_SEARCH_LIVE));
+      case TR_VODS:
+        return VodStreamSearch(widget.vods, _translate(TR_SEARCH_VOD));
+      default:
+        return null;
+    }
   }
 
+  void _onSearch() async {
+    final result = await showSearch(context: context, delegate: _searchDelegate());
+    if (result != null) {
+      _sendSearchEvent(result);
+    }
+  }
+
+  void _sendSearchEvent(stream) {
+    final _searchEvents = locator<SearchEvents>();
+    switch (_selectedType) {
+      case TR_LIVE_TV:
+        _searchEvents.publish(SearchEvent<LiveStream>(stream));
+        break;
+      case TR_VODS:
+        _searchEvents.publish(SearchEvent<VodStream>(stream));
+        break;
+      default:
+    }
+  }
+
+  // add/edit streams
   void _onTypeDelete() {
-    if (_channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty) {
+    if (_channels.isEmpty && widget.vods.isEmpty) {
       _selectedType = TR_EMPTY;
       _videoTypesList.clear();
     } else {

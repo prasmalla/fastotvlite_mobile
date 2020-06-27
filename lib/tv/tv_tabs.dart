@@ -1,14 +1,14 @@
-import 'dart:async';
+import 'package:fastotvlite/events/search_events.dart';
+import 'package:flutter/material.dart';
 
 import 'package:fastotv_common/base/controls/logo.dart';
 import 'package:fastotv_common/clock.dart';
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/screen_orientation.dart' as orientation;
-import 'package:fastotv_common/tv/key_code.dart';
+
 import 'package:fastotvlite/base/add_streams/add_stream_dialog.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
 import 'package:fastotvlite/base/icon.dart';
-import 'package:fastotvlite/base/login/textfields.dart';
 import 'package:fastotvlite/channels/istream.dart';
 import 'package:fastotvlite/channels/live_stream.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
@@ -28,16 +28,12 @@ import 'package:fastotvlite/tv/search_page.dart';
 import 'package:fastotvlite/tv/settings/tv_settings_page.dart';
 import 'package:fastotvlite/tv/streams/tv_live_tab_alt.dart';
 import 'package:fastotvlite/tv/vods/tv_vod_tab.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class HomeTV extends StatefulWidget {
   final List<LiveStream> channels;
   final List<VodStream> vods;
-  final List<VodStream> series;
-  final List<LiveStream> privateChannels;
 
-  HomeTV(this.channels, this.vods, this.series, this.privateChannels);
+  HomeTV(this.channels, this.vods);
 
   @override
   _HomeTVState createState() => _HomeTVState();
@@ -60,8 +56,10 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
 
   double _scale;
 
+  String get _currentCategory => _tabNodes[_tabController.index];
+
   int _initTypes() {
-    if (widget.channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty && widget.privateChannels.isEmpty) {
+    if (widget.channels.isEmpty && widget.vods.isEmpty) {
       return 0;
     }
 
@@ -92,30 +90,6 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
         for (int i = 0; i < _vods.length; i++) {
           if (_vods[i].id() == lastChannel) {
             lastType = 1;
-          }
-        }
-      }
-    }
-    if (widget.series.isNotEmpty) {
-      final series = TR_SERIES;
-      _tabNodes.add(series);
-      _typesTabView.add(TVVodPage(widget.series));
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.series.length; i++) {
-          if (widget.series[i].id() == lastChannel) {
-            lastType = 2;
-          }
-        }
-      }
-    }
-    if (widget.privateChannels.isNotEmpty) {
-      final priv = TR_PRIVATE_TV;
-      _tabNodes.add(priv);
-      _typesTabView.add(ChannelsTabHomeTV(_channels));
-      if (isSaved && lastType == null) {
-        for (int i = 0; i < widget.privateChannels.length; i++) {
-          if (widget.privateChannels[i].id() == lastChannel) {
-            lastType = 3;
           }
         }
       }
@@ -222,7 +196,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   Widget _home() {
     return _tabController.length > 0
         ? TabBarView(key: UniqueKey(), controller: _tabController, children: _typesTabView)
-        : Center(child: Text(AppLocalizations.of(context).translate(TR_NO_STREAMS), style: TextStyle(fontSize: 24)));
+        : Center(child: Text(TR_NO_STREAMS, style: TextStyle(fontSize: 24)));
   }
 
   Widget _clock() {
@@ -236,11 +210,27 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
       builder: (context, snapshot) => Clock.full(width: 108, textColor: color, hour24: snapshot.data.hour24));
   }
 
-  void _onSearch() async {
-    IStream stream = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(_channels)));
+  void _onSearch() {
+    switch (_currentCategory) {
+      case TR_LIVE_TV:
+        _openSearchPage<LiveStream>(_channels);
+        break;
+      case TR_VODS:
+        _openSearchPage<VodStream>(_vods);
+        break;
+      default:
+        break;
+    }
+  }
+
+  void _openSearchPage<T extends IStream>(List<T> streams) async {
+    final tvTabsEvents = locator<TvTabsEvents>();
+    tvTabsEvents.publish(OpenedTvSettings(true));
+    T stream = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(streams)));
+    tvTabsEvents.publish(OpenedTvSettings(false));
     if (stream != null) {
-      final tvTabsEvents = locator<TvTabsEvents>();
-      tvTabsEvents.publish(TvSearchEvent(stream));
+      final _search = locator<SearchEvents>();
+      _search.publish(SearchEvent<T>(stream));
     }
   }
 
@@ -334,7 +324,7 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
 
   void _onTypeDelete() {
     _currentType = 0;
-    if (_channels.isEmpty && widget.vods.isEmpty && widget.series.isEmpty) {
+    if (_channels.isEmpty && widget.vods.isEmpty) {
       _typesTabView.clear();
       _tabNodes.clear();
     } else {
@@ -353,11 +343,8 @@ class _Tab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-        focusNode: FocusNode(),
-        autofocus: true,
-        child: Tab(
-            child: Text(AppLocalizations.of(context).translate(title),
-                style: TextStyle(fontSize: 20, color: CustomColor().themeBrightnessColor(context)))));
+    return Tab(
+        child: Text(AppLocalizations.of(context).translate(title),
+            style: TextStyle(fontSize: 20, color: CustomColor().themeBrightnessColor(context))));
   }
 }

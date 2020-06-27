@@ -1,4 +1,5 @@
 import 'package:fastotv_common/base/controls/favorite_button.dart';
+import 'package:fastotvlite/base/vods/constants.dart';
 import 'package:fastotvlite/base/vods/vod_card_favorite_pos.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
@@ -6,14 +7,17 @@ import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/mobile/base_tab.dart';
 import 'package:fastotvlite/mobile/vods/movie_desc.dart';
 import 'package:fastotvlite/mobile/vods/vod_edit_channel.dart';
-import 'package:fastotvlite/mobile/vods/vod_player_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fastotv_common/base/vods/vod_card.dart';
 
-class VodVideoAppState extends VideoAppState<VodStream> {
-  static const EDGE_INSETS = 4.0;
-  static const CARD_WIDTH = 168.0;
+class VodTab extends BaseListTab<VodStream> {
+  VodTab(key, channels) : super(key, channels);
 
+  @override
+  VodVideoAppState createState() => VodVideoAppState();
+}
+
+class VodVideoAppState extends VideoAppState<VodStream> {
   String noRecent() => AppLocalizations.of(context).translate(TR_RECENT_LIVE);
 
   String noFavorite() => AppLocalizations.of(context).translate(TR_FAVORITE_LIVE);
@@ -26,8 +30,8 @@ class VodVideoAppState extends VideoAppState<VodStream> {
     deleteFavorite(stream);
   }
 
-  Widget tile(int, List<VodStream> channels) {
-    var channel = channels[int];
+  Widget tile(int index, List<VodStream> channels) {
+    var channel = channels[index];
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: EDGE_INSETS, vertical: EDGE_INSETS * 1.5),
         child: Stack(children: <Widget>[
@@ -36,7 +40,7 @@ class VodVideoAppState extends VideoAppState<VodStream> {
               duration: channel.duration(),
               interruptTime: channel.interruptTime(),
               width: CARD_WIDTH,
-              onPressed: () => toDescription(channel)),
+              onPressed: () => onTapped(channels, index)),
           VodFavoriteButton(
               width: 72,
               height: 36,
@@ -77,21 +81,15 @@ class VodVideoAppState extends VideoAppState<VodStream> {
                 itemBuilder: (BuildContext context, int index) => tile(index, channels))));
   }
 
-  void onTapped(List<VodStream> channels, int position) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => VodPlayer(channels[position])));
+  void onSearch(VodStream stream) {
+    onTapped([stream], 0);
   }
 
-  void toDescription(VodStream channel) async {
+  void onTapped(List<VodStream> channels, int position) async {
+    final channel = channels[position];
     final prevFav = channel.favorite();
     await Navigator.push(context, MaterialPageRoute(builder: (context) => VodDescription(vod: channel)));
     if (channel.favorite() != prevFav) handleFavorite(channel.favorite(), channel);
     addRecent(channel);
   }
-}
-
-class VodTab extends BaseListTab<VodStream> {
-  VodTab(key, channels, searchTexts) : super(key, channels, searchTexts);
-
-  @override
-  VodVideoAppState createState() => VodVideoAppState();
 }

@@ -1,8 +1,8 @@
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/runtime_device.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
+import 'package:fastotvlite/base/vods/constants.dart';
 import 'package:fastotvlite/base/vods/vod_card_favorite_pos.dart';
-import 'package:fastotvlite/base/vods/vod_cards_page.dart';
 import 'package:fastotvlite/channels/live_stream.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';

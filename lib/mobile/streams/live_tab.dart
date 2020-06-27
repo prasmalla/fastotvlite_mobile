@@ -13,7 +13,7 @@ import 'package:fastotvlite/shared_prefs.dart';
 import 'package:flutter/material.dart';
 
 class LiveTab extends BaseListTab<LiveStream> {
-  LiveTab(key, channels, searchText) : super(key, channels, searchText);
+  LiveTab(key, channels) : super(key, channels);
 
   @override
   LiveVideoAppState createState() => LiveVideoAppState();
@@ -42,19 +42,17 @@ class LiveVideoAppState extends VideoAppState<LiveStream> with ILiveFutureTileOb
     recentlyViewed.close();
   }
 
-  Widget tile(int, List<LiveStream> channels) {
-    return LiveFutureTile(channels: channels, index: int, observer: this);
-  }
-
   ListView listBuilder(List<LiveStream> channels) {
     return ListView.separated(
         separatorBuilder: (context, int index) => Divider(height: 0),
         itemCount: channels.length,
         itemBuilder: (context, index) {
-          return Visibility(
-              visible: splitInWords(channels[index].displayName()),
-              child: LiveFutureTile(channels: channels, index: index, observer: this));
+          return LiveFutureTile(channels: channels, index: index, observer: this);
         });
+  }
+
+  void onSearch(LiveStream stream) {
+    onTap([stream], 0);
   }
 
   void onTapped(List<LiveStream> channels, int position) async {

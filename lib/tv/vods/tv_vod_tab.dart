@@ -1,3 +1,6 @@
+import 'package:fastotvlite/base/vods/constants.dart';
+import 'package:fastotvlite/events/search_events.dart';
+import 'package:fastotvlite/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,7 +12,6 @@ import 'package:flutter_fastotv_common/base/vods/vod_card.dart';
 
 import 'package:fastotvlite/base/stream_parser.dart';
 import 'package:fastotvlite/base/vods/vod_card_favorite_pos.dart';
-import 'package:fastotvlite/base/vods/vod_cards_page.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
@@ -26,7 +28,6 @@ class TVVodPage extends StatefulWidget {
 }
 
 class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
-  static const EDGE_INSETS = 4.0;
   static const BORDER_WIDTH = 6.0;
 
   static const TABBAR_FONT_SIZE = 24.0;
@@ -45,6 +46,8 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
     super.initState();
     channelsMap = StreamsParser<VodStream>(widget.channels).parseChannels();
     _initTabController();
+    final _search = locator<SearchEvents>();
+    _search.subscribe<SearchEvent<VodStream>>().listen((event) => _onSearch(event.stream));
   }
 
   @override
@@ -126,7 +129,7 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: CARD_WIDTH + 2 * EDGE_INSETS,
+                    maxCrossAxisExtent: CARD_WIDTH_TV + 2 * EDGE_INSETS,
                     crossAxisSpacing: EDGE_INSETS,
                     mainAxisSpacing: EDGE_INSETS,
                     childAspectRatio: 2 / 3),
@@ -135,7 +138,7 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
                   final node = _list[index];
                   return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: EDGE_INSETS, vertical: EDGE_INSETS * 1.5),
-                      child: Center(child: _CardWrap(node, _onCard, CARD_WIDTH, BORDER_WIDTH)));
+                      child: Center(child: _CardWrap(node, _onCard, CARD_WIDTH_TV, BORDER_WIDTH)));
                 })));
   }
 
@@ -160,21 +163,21 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
           break;
 
         case KEY_LEFT:
-          if (FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH) {
+          if (FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH_TV) {
             FocusScope.of(context).focusInDirection(TraversalDirection.left);
           } else {
             FocusScope.of(context).focusInDirection(TraversalDirection.up);
-            while (MediaQuery.of(context).size.width - FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH * 2) {
+            while (MediaQuery.of(context).size.width - FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH_TV * 2) {
               FocusScope.of(context).focusInDirection(TraversalDirection.right);
             }
           }
           break;
 
         case KEY_RIGHT:
-          if (MediaQuery.of(context).size.width - FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH * 2) {
+          if (MediaQuery.of(context).size.width - FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH_TV * 2) {
             FocusScope.of(context).focusInDirection(TraversalDirection.right);
           } else {
-            while (FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH) {
+            while (FocusScope.of(context).focusedChild.offset.dx > CARD_WIDTH_TV) {
               FocusScope.of(context).focusInDirection(TraversalDirection.left);
             }
             FocusScope.of(context).focusInDirection(TraversalDirection.down);
@@ -216,6 +219,17 @@ class _TVVodPageState extends State<TVVodPage> with TickerProviderStateMixin {
       channelsMap[TR_RECENT].sort((b, a) => a.recentTime().compareTo(b.recentTime()));
     } else {
       channelsMap[TR_RECENT].insert(0, channel);
+    }
+  }
+  
+  void _onSearch(VodStream stream) {
+    for (int i = 0; i < channelsMap[TR_ALL].length; i++) {
+      final s = channelsMap[TR_ALL][i];
+      if (s.displayName() == stream.displayName()) {
+        currentCategory = 2;
+        _onCardTap(s);
+        break;
+      }
     }
   }
 }

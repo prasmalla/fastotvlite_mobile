@@ -1,3 +1,4 @@
+import 'package:fastotvlite/events/search_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -84,7 +85,11 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
 
     final tvTabsEvent = locator<TvTabsEvents>();
     tvTabsEvent.subscribe<OpenedTvSettings>().listen((event) => controlFromTabs(event.value));
-    tvTabsEvent.subscribe<TvSearchEvent>().listen((event) => _onSearch(event.stream));
+    
+    final _search = locator<SearchEvents>();
+    _search.subscribe<SearchEvent<LiveStream>>().listen((event) {
+      _onSearch(event.stream);
+    });
     
     _playing = _currentChannels[0];
     _initPlayerPage(_playing);
@@ -174,11 +179,13 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
   Color selectedColor(FocusNode focus) => focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
 
   void controlFromTabs(bool settingsOpened) {
-    if (settingsOpened) {
-      _playerPage.pause();
-    } else {
-      _playerPage.playChannel(_playing);
-    } 
+    if (mounted) {
+      if (settingsOpened) {
+        _playerPage.pause();
+      } else {
+        _playerPage.playChannel(_playing);
+      } 
+    }
   }
 
   // init

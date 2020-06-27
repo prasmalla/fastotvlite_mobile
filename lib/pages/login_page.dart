@@ -16,8 +16,6 @@ class LoginPageBuffer extends StatefulWidget {
 class _LoginPageBufferState extends State<LoginPageBuffer> {
   List<LiveStream> channels = [];
   List<VodStream> vods = [];
-  List<VodStream> series = [];
-  List<LiveStream> privateChannels = [];
   bool _hasTouch;
 
   @override
@@ -41,7 +39,7 @@ class _LoginPageBufferState extends State<LoginPageBuffer> {
   @override
   Widget build(BuildContext context) {
     return _hasTouch
-        ? HomePage(channels, vods, series, privateChannels)
-        : HomeTV(channels, vods, series, privateChannels);
+        ? HomePage(channels, vods)
+        : HomeTV(channels, vods);
   }
 }

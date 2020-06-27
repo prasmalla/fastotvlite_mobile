@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/tv/key_code.dart';
-import 'package:fastotv_common/runtime_device.dart';
 import 'package:fastotv_common/base/controls/no_channels.dart';
 
 import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/base/login/textfields.dart';
 import 'package:fastotvlite/channels/istream.dart';
-import 'package:fastotvlite/service_locator.dart';
 
 class SearchPage extends StatefulWidget {
   final List<IStream> streams;
@@ -23,15 +21,12 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  bool _hasTouch;
 
   List<IStream> _streams = [];
 
   @override
   void initState() {
     super.initState();
-    final device = locator<RuntimeDevice>();
-    _hasTouch = device.hasTouch;
     _streams.addAll(widget.streams);
   }
 
@@ -42,12 +37,12 @@ class _SearchPageState extends State<SearchPage> {
     return WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
-            backgroundColor: _hasTouch ? null : primaryColor,
+            backgroundColor:primaryColor,
             appBar: AppBar(
                 centerTitle: true,
-                elevation: _hasTouch ? null : 0,
+                elevation:0,
                 iconTheme: IconThemeData(color: appBarTextColor),
-                title: FractionallySizedBox(child: _SearchField(_search), widthFactor: _hasTouch ? 1.0 : 0.5),
+                title: FractionallySizedBox(child: _SearchField(_search), widthFactor: 0.5),
                 leading: IconButton(
                     icon: Icon(Icons.arrow_back),
                     onPressed: () => _exit(null))),
@@ -60,7 +55,7 @@ class _SearchPageState extends State<SearchPage> {
     }
     return Center(
         child: FractionallySizedBox(
-            widthFactor: _hasTouch ? 1.0 : 0.4,
+            widthFactor: 0.4,
             child: Container(
                 child: ListView.builder(
                     itemCount: _streams.length,

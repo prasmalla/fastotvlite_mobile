@@ -2,7 +2,7 @@ import 'package:fastotv_common/colors.dart';
 import 'package:fastotv_common/wrap.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
 import 'package:fastotvlite/base/add_streams/select_streams.dart';
-import 'package:fastotvlite/base/vods/vod_cards_page.dart';
+import 'package:fastotvlite/base/vods/constants.dart';
 import 'package:flutter/material.dart';
 
 class ChannelsPreviewPage extends StatefulWidget {
@@ -71,8 +71,8 @@ class _ChannelsPreviewPageState extends BaseSelectStreamPage<ChannelsPreviewPage
     return CustomWrap(
         width: MediaQuery.of(context).size.width,
         itemWidth: CARD_WIDTH + BORDER_WIDTH,
-        horizontalPadding: CARD_EDGE_INSETS,
-        verticalPadding: CARD_EDGE_INSETS,
+        horizontalPadding: EDGE_INSETS,
+        verticalPadding: EDGE_INSETS,
         children: List<Widget>.generate(vods.length, (int index) {
           return VodSelectCard(vods[index], checkValues[index], () => onCheckBox(index));
         }));

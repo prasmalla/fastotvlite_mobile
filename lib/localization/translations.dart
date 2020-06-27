@@ -20,11 +20,12 @@ const String TR_CATCHUP = 'Catchup';
 const String TR_VODS = 'VODs';
 const String TR_FAVORITE_VOD = "No favorite movies";
 const String TR_RECENT_VOD = "No recent movies";
-const String TR_SERIES = 'Series';
-const String TR_PRIVATE_TV = 'PrivateTV';
 const String TR_SETTINGS = 'Settings';
 const String TR_ABOUT = 'About';
 const String TR_EMPTY = 'Empty';
+const String TR_SEARCH_LIVE = "Search live";
+const String TR_SEARCH_VOD = "Search vod";
+const String TR_SEARCH_EMPTY = "Search empty";
 
 const String TR_PLAYER = "Player";
 const String TR_LAST_VIEWED = "Last viewed";
