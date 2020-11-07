@@ -63,7 +63,7 @@ class VodPlayerPage extends StatefulWidget {
   void seekBackward(Duration duration) {
     _player.seekBackward(duration);
   }
-  
+
   Widget timeLine() {
     return _player.timeLine();
   }
@@ -87,7 +87,7 @@ class LiteTrailerPlayer<T extends StatefulWidget> extends LitePlayer<T> {
 
   @override
   void onPlaying(dynamic userData) {}
-  
+
   @override
   void onPlayingError(dynamic userData) {}
 
@@ -100,7 +100,8 @@ class LiteTrailerPlayer<T extends StatefulWidget> extends LitePlayer<T> {
 class TrailerPlayerPage extends StatefulWidget {
   final LiteTrailerPlayer<TrailerPlayerPage> _player;
 
-  TrailerPlayerPage(String link) : _player = LiteTrailerPlayer<TrailerPlayerPage>(link);
+  TrailerPlayerPage(String link)
+      : _player = LiteTrailerPlayer<TrailerPlayerPage>(link);
 
   void play() {
     _player.play();

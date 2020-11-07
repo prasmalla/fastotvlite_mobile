@@ -1,5 +1,5 @@
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/player/vod_player.dart';
@@ -52,7 +52,8 @@ class _TvVodPlayerPageState extends State<TvVodPlayerPage> {
       child: Scaffold(
           body: Builder(
               builder: (context) => Focus(
-                  onKey: (FocusNode node, RawKeyEvent event) => _onPlayer(event, context),
+                  onKey: (FocusNode node, RawKeyEvent event) =>
+                      _onPlayer(event, context),
                   focusNode: playerFocus,
                   child: Container(child: _playerPage)))),
     );
@@ -67,7 +68,9 @@ class _TvVodPlayerPageState extends State<TvVodPlayerPage> {
     if (show) {
       final contentColor = CustomColor().themeBrightnessColor(context);
       final snack = SnackBar(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black87 : Colors.white70,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black87
+              : Colors.white70,
           content: Container(
               child: Row(children: <Widget>[
             SizedBox(width: 32),
@@ -77,7 +80,8 @@ class _TvVodPlayerPageState extends State<TvVodPlayerPage> {
                 maxLines: 1,
                 softWrap: false),
             Spacer(),
-            Icon(_playerPage.isPlaying() ? Icons.pause : Icons.play_arrow, size: 48, color: contentColor)
+            Icon(_playerPage.isPlaying() ? Icons.pause : Icons.play_arrow,
+                size: 48, color: contentColor)
           ])));
       _isSnackBarActive = true;
       Scaffold.of(ctx).showSnackBar(snack).closed.then((_) {

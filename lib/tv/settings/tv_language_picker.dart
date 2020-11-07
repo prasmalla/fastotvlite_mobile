@@ -1,5 +1,5 @@
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/service_locator.dart';
 import 'package:fastotvlite/shared_prefs.dart';
@@ -25,7 +25,9 @@ class _LanguagePickerTVState extends State<LanguagePickerTV> {
   @override
   Widget build(BuildContext context) {
     int currentLanguageIndex() {
-      return SUPPORTED_LOCALES.indexOf(AppLocalizations.of(context).currentLocale()) ?? 0;
+      return SUPPORTED_LOCALES
+              .indexOf(AppLocalizations.of(context).currentLocale()) ??
+          0;
     }
 
     _currentSelection = currentLanguageIndex();
@@ -35,7 +37,9 @@ class _LanguagePickerTVState extends State<LanguagePickerTV> {
             child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: new List<Widget>.generate(
-                    SUPPORTED_LANGUAGES.length, (int index) => _dialogItem(SUPPORTED_LANGUAGES[index], index)))));
+                    SUPPORTED_LANGUAGES.length,
+                    (int index) =>
+                        _dialogItem(SUPPORTED_LANGUAGES[index], index)))));
   }
 
   Widget _dialogItem(String text, int itemvalue) {
@@ -45,7 +49,9 @@ class _LanguagePickerTVState extends State<LanguagePickerTV> {
         child: Container(
             decoration: BoxDecoration(
                 border: Border.all(
-                    color: borderColor(itemvalue == _currentSelection && widget.focus.hasPrimaryFocus), width: 2)),
+                    color: borderColor(itemvalue == _currentSelection &&
+                        widget.focus.hasPrimaryFocus),
+                    width: 2)),
             child: RadioListTile(
                 activeColor: CustomColor().tvSelectedColor(),
                 title: Text(text, style: TextStyle(fontSize: 20)),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/tv/key_code.dart';
-import 'package:fastotv_common/base/controls/no_channels.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/tv/key_code.dart';
+import 'package:flutter_common/base/controls/no_channels.dart';
 
 import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
 
@@ -21,7 +21,6 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-
   List<IStream> _streams = [];
 
   @override
@@ -33,16 +32,18 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
-    final appBarTextColor = CustomColor().backGroundColorBrightness(primaryColor);
+    final appBarTextColor =
+        CustomColor().backGroundColorBrightness(primaryColor);
     return WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
-            backgroundColor:primaryColor,
+            backgroundColor: primaryColor,
             appBar: AppBar(
                 centerTitle: true,
-                elevation:0,
+                elevation: 0,
                 iconTheme: IconThemeData(color: appBarTextColor),
-                title: FractionallySizedBox(child: _SearchField(_search), widthFactor: 0.5),
+                title: FractionallySizedBox(
+                    child: _SearchField(_search), widthFactor: 0.5),
                 leading: IconButton(
                     icon: Icon(Icons.arrow_back),
                     onPressed: () => _exit(null))),
@@ -51,7 +52,9 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _body() {
     if (_streams.isEmpty) {
-      return Center(child: NonAvailableBuffer(icon: Icons.search, message: 'Nothing found'));
+      return Center(
+          child:
+              NonAvailableBuffer(icon: Icons.search, message: 'Nothing found'));
     }
     return Center(
         child: FractionallySizedBox(
@@ -59,7 +62,8 @@ class _SearchPageState extends State<SearchPage> {
             child: Container(
                 child: ListView.builder(
                     itemCount: _streams.length,
-                    itemBuilder: (BuildContext context, int index) => _Tile(channel: _streams[index], onChannel: _exit)))));
+                    itemBuilder: (BuildContext context, int index) =>
+                        _Tile(channel: _streams[index], onChannel: _exit)))));
   }
 
   void _search(String term) {
@@ -87,7 +91,8 @@ class _SearchField extends StatefulWidget {
 }
 
 class _SearchFieldState extends State<_SearchField> {
-  TextFieldNode _textFieldNode = TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
+  TextFieldNode _textFieldNode =
+      TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
 
   TextEditingController _controller = TextEditingController(text: '');
 
@@ -205,7 +210,8 @@ class _TileState extends State<_Tile> {
   }
 
   Widget _channelAvatar(IStream channel) {
-    return PreviewIcon.live(channel.icon(), height: CHANNEL_AVATAR_SIZE.height, width: CHANNEL_AVATAR_SIZE.width);
+    return PreviewIcon.live(channel.icon(),
+        height: CHANNEL_AVATAR_SIZE.height, width: CHANNEL_AVATAR_SIZE.width);
   }
 
   Color _backgroundColor() {

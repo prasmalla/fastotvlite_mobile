@@ -1,7 +1,7 @@
-import 'package:fastotv_common/base/controls/favorite_button.dart';
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/scroll_controller_manager.dart';
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/base/controls/favorite_button.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/scroll_controller_manager.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/base/vods/vod_description.dart';
 import 'package:fastotvlite/channels/vod_stream.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
@@ -28,9 +28,11 @@ class _TvVodDescriptionState extends State<TvVodDescription> {
 
   FocusScopeNode descriptionScope = FocusScopeNode();
   FocusNode descriptionNode = FocusNode();
-  CustomScrollController descriptionController = CustomScrollController(itemHeight: DESCRIPTION_FONT_SIZE);
+  CustomScrollController descriptionController =
+      CustomScrollController(itemHeight: DESCRIPTION_FONT_SIZE);
   FocusNode infoNode = FocusNode();
-  CustomScrollController infoController = CustomScrollController(itemHeight: DESCRIPTION_FONT_SIZE);
+  CustomScrollController infoController =
+      CustomScrollController(itemHeight: DESCRIPTION_FONT_SIZE);
   FocusNode backButtonNode = FocusNode();
   FocusNode posterNode = FocusNode();
   FocusNode playNode = FocusNode();
@@ -51,11 +53,13 @@ class _TvVodDescriptionState extends State<TvVodDescription> {
     });
   }
 
-  BoxBorder border(FocusNode focus) =>
-      Border.all(color: focus.hasPrimaryFocus ? activeColor : Colors.transparent, width: 2);
+  BoxBorder border(FocusNode focus) => Border.all(
+      color: focus.hasPrimaryFocus ? activeColor : Colors.transparent,
+      width: 2);
 
-  Color buttonColor(FocusNode node) =>
-      node.hasPrimaryFocus ? activeColor : CustomColor().backGroundColorBrightness(Theme.of(context).primaryColor);
+  Color buttonColor(FocusNode node) => node.hasPrimaryFocus
+      ? activeColor
+      : CustomColor().backGroundColorBrightness(Theme.of(context).primaryColor);
 
   @override
   Widget build(BuildContext context) {
@@ -73,24 +77,38 @@ class _TvVodDescriptionState extends State<TvVodDescription> {
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                   centerTitle: true,
-                  title: Text(AppLocalizations.toUtf8(widget.channel.displayName()),
-                      style: TextStyle(color: CustomColor().themeBrightnessColor(context))),
+                  title: Text(
+                      AppLocalizations.toUtf8(widget.channel.displayName()),
+                      style: TextStyle(
+                          color: CustomColor().themeBrightnessColor(context))),
                   leading: _backButton(),
-                  actions: <Widget>[_playButton(), _trailerButton(), _starButton()]),
+                  actions: <Widget>[
+                    _playButton(),
+                    _trailerButton(),
+                    _starButton()
+                  ]),
               body: Padding(
                   padding: EdgeInsets.all(16.0 * _scaleFactor),
-                  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                      Padding(
-                          padding: EdgeInsets.all(8.0 * _scaleFactor),
-                          child: Row(children: <Widget>[
-                            _score(),
-                            VerticalDivider(color: Colors.white),
-                            _info(),
-                          ])),
-                      Row(children: <Widget>[_poster(), SizedBox(width: 16), _description()])
-                    ])
-                  ])),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                  padding: EdgeInsets.all(8.0 * _scaleFactor),
+                                  child: Row(children: <Widget>[
+                                    _score(),
+                                    VerticalDivider(color: Colors.white),
+                                    _info(),
+                                  ])),
+                              Row(children: <Widget>[
+                                _poster(),
+                                SizedBox(width: 16),
+                                _description()
+                              ])
+                            ])
+                      ])),
             ),
           )),
     );
@@ -100,29 +118,36 @@ class _TvVodDescriptionState extends State<TvVodDescription> {
       focusNode: backButtonNode,
       onKey: _onBackButton,
       child: IconButton(
-          icon: Icon(Icons.arrow_back), iconSize: 32, color: buttonColor(backButtonNode), onPressed: () => _goBack()));
+          icon: Icon(Icons.arrow_back),
+          iconSize: 32,
+          color: buttonColor(backButtonNode),
+          onPressed: () => _goBack()));
 
   Widget _playButton() => Padding(
       padding: const EdgeInsets.all(8.0),
       child: Focus(
           focusNode: playNode,
           onKey: _onPlayButton,
-          child: VodPlayButton(widget.channel, context, color: buttonColor(playNode))));
+          child: VodPlayButton(widget.channel, context,
+              color: buttonColor(playNode))));
 
   Widget _trailerButton() => Padding(
       padding: const EdgeInsets.all(8.0),
       child: Focus(
           focusNode: trailerNode,
           onKey: _onTrailerButton,
-          child: VodTrailerButton(widget.channel, context, color: buttonColor(trailerNode))));
+          child: VodTrailerButton(widget.channel, context,
+              color: buttonColor(trailerNode))));
 
   Widget _starButton() => Focus(
       focusNode: favoriteNode,
       onKey: _onFavoriteButton,
       child: FavoriteStarButton(widget.channel.favorite(),
-          unselectedColor: buttonColor(favoriteNode), selectedColor: buttonColor(favoriteNode)));
+          unselectedColor: buttonColor(favoriteNode),
+          selectedColor: buttonColor(favoriteNode)));
 
-  Widget _score() => UserScore(widget.channel.userScore(), fontSize: INFO_FONT_SIZE * _scaleFactor);
+  Widget _score() => UserScore(widget.channel.userScore(),
+      fontSize: INFO_FONT_SIZE * _scaleFactor);
 
   Widget _info() => Focus(
       onKey: _onInfo,
@@ -154,8 +179,10 @@ class _TvVodDescriptionState extends State<TvVodDescription> {
           width: MediaQuery.of(context).size.width / 2,
           height: 196 * 3 / 2 * _scaleFactor,
           decoration: BoxDecoration(border: border(descriptionNode)),
-          child: VodDescriptionText(AppLocalizations.toUtf8(widget.channel.description()),
-              textSize: DESCRIPTION_FONT_SIZE * _scaleFactor, scrollController: descriptionController.controller)));
+          child: VodDescriptionText(
+              AppLocalizations.toUtf8(widget.channel.description()),
+              textSize: DESCRIPTION_FONT_SIZE * _scaleFactor,
+              scrollController: descriptionController.controller)));
 
   void _goBack() {
     Navigator.of(context).pop();

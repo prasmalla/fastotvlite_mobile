@@ -1,6 +1,6 @@
-import 'package:fastotv_common/package_manager.dart';
-import 'package:fastotv_common/runtime_device.dart';
-import 'package:fastotv_common/time_manager.dart';
+import 'package:flutter_common/package_manager.dart';
+import 'package:flutter_common/runtime_device.dart';
+import 'package:flutter_common/time_manager.dart';
 import 'package:fastotvlite/events/search_events.dart';
 import 'package:fastotvlite/events/stream_list_events.dart';
 import 'package:fastotvlite/events/tv_events.dart';

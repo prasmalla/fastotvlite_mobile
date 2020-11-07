@@ -1,5 +1,5 @@
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/runtime_device.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/runtime_device.dart';
 import 'package:fastotvlite/base/add_streams/m3u_file_picker.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
 import 'package:fastotvlite/channels/live_stream.dart';
@@ -57,13 +57,16 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
           Spacer(),
           _exitButton()
         ]),
-        titlePadding:
-            EdgeInsets.symmetric(vertical: !hasTouch || _inputLink ? 12 : 24, horizontal: _inputLink ? 8 : 24),
-        contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: _inputLink ? 24 : 0),
+        titlePadding: EdgeInsets.symmetric(
+            vertical: !hasTouch || _inputLink ? 12 : 24,
+            horizontal: _inputLink ? 8 : 24),
+        contentPadding:
+            EdgeInsets.symmetric(vertical: 0, horizontal: _inputLink ? 24 : 0),
         content: loading
             ? _loadingWidget()
             : SingleChildScrollView(
-                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                child:
+                    Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                 Divider(height: 0),
                 _inputLink ? textField() : _tiles(),
                 Divider(height: 0),
@@ -73,22 +76,29 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
   }
 
   Widget _loadingWidget() {
-    final color = hasTouch ? Theme.of(context).accentColor : CustomColor().tvSelectedColor();
+    final color = hasTouch
+        ? Theme.of(context).accentColor
+        : CustomColor().tvSelectedColor();
     return SizedBox(
         height: 64,
         width: 64,
-        child: Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(color))));
+        child: Center(
+            child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(color))));
   }
 
   Widget _button(String text, void Function() onPressed, {Color color}) {
     final activeColor = hasTouch ? Theme.of(context).accentColor : null;
-    final disabledColor = CustomColor().themeBrightnessColor(context).withOpacity(0.5);
+    final disabledColor =
+        CustomColor().themeBrightnessColor(context).withOpacity(0.5);
     return FlatButton(
         color: activeColor,
         disabledColor: disabledColor,
         child: Text(text,
             style: hasTouch
-                ? TextStyle(color: CustomColor().backGroundColorBrightness(!validator ? disabledColor : activeColor))
+                ? TextStyle(
+                    color: CustomColor().backGroundColorBrightness(
+                        !validator ? disabledColor : activeColor))
                 : null),
         onPressed: onPressed);
   }
@@ -98,7 +108,9 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
       return SizedBox();
     }
     return IconButton(
-        icon: Icon(Icons.arrow_back), onPressed: () => setState(() => _inputLink = false), padding: EdgeInsets.all(0));
+        icon: Icon(Icons.arrow_back),
+        onPressed: () => setState(() => _inputLink = false),
+        padding: EdgeInsets.all(0));
   }
 
   Widget _exitButton() {
@@ -113,8 +125,10 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
   }
 
   Widget _tiles() {
-    return Column(
-        mainAxisSize: MainAxisSize.min, children: <Widget>[_typeTile(StreamType.Live), _typeTile(StreamType.Vod)]);
+    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+      _typeTile(StreamType.Live),
+      _typeTile(StreamType.Vod)
+    ]);
   }
 
   Widget _typeTile(StreamType value) {
@@ -123,7 +137,9 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
         onTap: hasTouch ? () => _onChanged(value) : null,
         leading: Radio(
             autofocus: true,
-            activeColor: hasTouch ? Theme.of(context).accentColor : CustomColor().tvSelectedColor(),
+            activeColor: hasTouch
+                ? Theme.of(context).accentColor
+                : CustomColor().tvSelectedColor(),
             groupValue: _streamType,
             value: value,
             onChanged: (StreamType value) => _onChanged(value)));
@@ -135,14 +151,25 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
     }
 
     return Padding(
-        padding: EdgeInsets.symmetric(horizontal: _inputLink ? 0 : 24, vertical: 16),
+        padding:
+            EdgeInsets.symmetric(horizontal: _inputLink ? 0 : 24, vertical: 16),
         child: _inputLink
-            ? _button(translate(TR_LOAD), _streamType == null ? null : () => _loadFromLink())
-            : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-                _button(translate(TR_ADD_FILE), _streamType == null ? null : () => _onFile()),
-                Padding(padding: const EdgeInsets.all(8.0), child: Text(translate(TR_ADD_OR))),
-                _button(translate(TR_ADD_LINK), _streamType == null ? null : () => setState(() => _inputLink = true))
-              ]));
+            ? _button(translate(TR_LOAD),
+                _streamType == null ? null : () => _loadFromLink())
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                    _button(translate(TR_ADD_FILE),
+                        _streamType == null ? null : () => _onFile()),
+                    Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(translate(TR_ADD_OR))),
+                    _button(
+                        translate(TR_ADD_LINK),
+                        _streamType == null
+                            ? null
+                            : () => setState(() => _inputLink = true))
+                  ]));
   }
 
   // common
@@ -161,11 +188,13 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
       if (m3uText != null) {
         if (m3uText.isNotEmpty) {
           output = await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) =>
-                  hasTouch ? ChannelsPreviewPage(m3uText, _streamType) : SelectStreamTV(m3uText, _streamType)));
+              builder: (context) => hasTouch
+                  ? ChannelsPreviewPage(m3uText, _streamType)
+                  : SelectStreamTV(m3uText, _streamType)));
         }
       }
-      WidgetsBinding.instance.addPostFrameCallback((_) => Navigator.of(context).pop(output));
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => Navigator.of(context).pop(output));
     }
   }
 
@@ -173,19 +202,24 @@ abstract class BaseFilePickerDialogState extends State<BaseFilePickerDialog> {
     AddStreamResponse _result;
     if (_streamType == StreamType.Live) {
       LiveStream _response = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => hasTouch ? LiveAddPage(LiveStream.empty()) : LiveAddPageTV(LiveStream.empty())));
+          builder: (context) => hasTouch
+              ? LiveAddPage(LiveStream.empty())
+              : LiveAddPageTV(LiveStream.empty())));
       if (_response != null) {
         _result = AddStreamResponse(StreamType.Live, channels: [_response]);
       }
     } else {
       VodStream _response = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => hasTouch ? VodAddPage(VodStream.empty()) : VodAddPageTV(VodStream.empty())));
+          builder: (context) => hasTouch
+              ? VodAddPage(VodStream.empty())
+              : VodAddPageTV(VodStream.empty())));
       if (_response != null) {
         _result = AddStreamResponse(StreamType.Vod, vods: [_response]);
       }
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => Navigator.of(context).pop(_result));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => Navigator.of(context).pop(_result));
   }
 
   // link

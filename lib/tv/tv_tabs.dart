@@ -1,10 +1,10 @@
 import 'package:fastotvlite/events/search_events.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fastotv_common/base/controls/logo.dart';
-import 'package:fastotv_common/clock.dart';
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/screen_orientation.dart' as orientation;
+import 'package:flutter_common/base/controls/logo.dart';
+import 'package:flutter_common/clock.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/screen_orientation.dart' as orientation;
 
 import 'package:fastotvlite/base/add_streams/add_stream_dialog.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
@@ -41,7 +41,8 @@ class HomeTV extends StatefulWidget {
 
 const TABBAR_HEIGHT = 72;
 
-class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsBindingObserver {
+class _HomeTVState extends State<HomeTV>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final List<String> _tabNodes = [];
   List<Widget> _typesTabView = [];
 
@@ -102,7 +103,8 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   }
 
   void _initTabController() {
-    _tabController = TabController(vsync: this, length: _tabNodes.length, initialIndex: _currentType);
+    _tabController = TabController(
+        vsync: this, length: _tabNodes.length, initialIndex: _currentType);
   }
 
   @override
@@ -127,7 +129,8 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       _saveStreams();
     }
   }
@@ -169,24 +172,35 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
                       Visibility(
                           visible: isVisible,
                           child: AppBar(
-                              leading: Padding(padding: const EdgeInsets.fromLTRB(16, 8, 0, 8), child: Logo(LOGO_PATH)),
+                              leading: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                                  child: Logo(LOGO_PATH)),
                               backgroundColor: Colors.transparent,
-                              iconTheme: IconThemeData(color: CustomColor().themeBrightnessColor(context)),
-                              actionsIconTheme: IconThemeData(color: CustomColor().themeBrightnessColor(context)),
+                              iconTheme: IconThemeData(
+                                  color: CustomColor()
+                                      .themeBrightnessColor(context)),
+                              actionsIconTheme: IconThemeData(
+                                  color: CustomColor()
+                                      .themeBrightnessColor(context)),
                               elevation: 0,
                               title: Row(children: <Widget>[
                                 SizedBox(width: 16),
                                 TabBar(
-                                    indicatorColor: CustomColor().tvSelectedColor(),
+                                    indicatorColor:
+                                        CustomColor().tvSelectedColor(),
                                     controller: _tabController,
                                     isScrollable: true,
-                                    tabs: List<_Tab>.generate(_tabNodes.length, (int index) => _Tab(_tabNodes[index])))
+                                    tabs: List<_Tab>.generate(_tabNodes.length,
+                                        (int index) => _Tab(_tabNodes[index])))
                               ]),
                               actions: <Widget>[
                                 CustomIcons(Icons.search, () => _onSearch()),
                                 CustomIcons(Icons.add_circle, () => _onAdd()),
-                                CustomIcons(Icons.settings, () => _toSettings()),
-                                CustomIcons(Icons.power_settings_new, () => _showExitDialog()),
+                                CustomIcons(
+                                    Icons.settings, () => _toSettings()),
+                                CustomIcons(Icons.power_settings_new,
+                                    () => _showExitDialog()),
                                 _clock()
                               ])),
                       Expanded(child: _homeWidget)
@@ -195,7 +209,10 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
 
   Widget _home() {
     return _tabController.length > 0
-        ? TabBarView(key: UniqueKey(), controller: _tabController, children: _typesTabView)
+        ? TabBarView(
+            key: UniqueKey(),
+            controller: _tabController,
+            children: _typesTabView)
         : Center(child: Text(TR_NO_STREAMS, style: TextStyle(fontSize: 24)));
   }
 
@@ -205,9 +222,10 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
     final tvTabsEvents = locator<TvTabsEvents>();
     final color = CustomColor().themeBrightnessColor(context);
     return StreamBuilder<ClockFormatChanged>(
-      initialData: ClockFormatChanged(_initFormat),
-      stream: tvTabsEvents.subscribe<ClockFormatChanged>(),
-      builder: (context, snapshot) => Clock.full(width: 108, textColor: color, hour24: snapshot.data.hour24));
+        initialData: ClockFormatChanged(_initFormat),
+        stream: tvTabsEvents.subscribe<ClockFormatChanged>(),
+        builder: (context, snapshot) => Clock.full(
+            width: 108, textColor: color, hour24: snapshot.data.hour24));
   }
 
   void _onSearch() {
@@ -226,7 +244,8 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   void _openSearchPage<T extends IStream>(List<T> streams) async {
     final tvTabsEvents = locator<TvTabsEvents>();
     tvTabsEvents.publish(OpenedTvSettings(true));
-    T stream = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(streams)));
+    T stream = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SearchPage(streams)));
     tvTabsEvents.publish(OpenedTvSettings(false));
     if (stream != null) {
       final _search = locator<SearchEvents>();
@@ -237,17 +256,20 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   void _toSettings() async {
     final tvTabsEvents = locator<TvTabsEvents>();
     tvTabsEvents.publish(OpenedTvSettings(true));
-    double padding = await Navigator.push(context, MaterialPageRoute(builder: (context) => SettingPageTV()));
+    double padding = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SettingPageTV()));
     tvTabsEvents.publish(OpenedTvSettings(false));
     setState(() => _scale = padding);
   }
 
   void _onAdd() async {
-    PickStreamFrom _source =
-        await showDialog(context: context, builder: (BuildContext context) => StreamTypePickerTV());
+    PickStreamFrom _source = await showDialog(
+        context: context,
+        builder: (BuildContext context) => StreamTypePickerTV());
     if (_source != null) {
-      AddStreamResponse result =
-          await showDialog(context: context, builder: (BuildContext context) => FilePickerDialogTV(_source));
+      AddStreamResponse result = await showDialog(
+          context: context,
+          builder: (BuildContext context) => FilePickerDialogTV(_source));
       if (result != null) {
         if (result.type == StreamType.Live) {
           _addLiveStreams(result.channels);
@@ -304,7 +326,8 @@ class _HomeTVState extends State<HomeTV> with TickerProviderStateMixin, WidgetsB
   }
 
   void _showExitDialog() async {
-    await showDialog(context: context, builder: (BuildContext context) => ExitDialog());
+    await showDialog(
+        context: context, builder: (BuildContext context) => ExitDialog());
   }
 
   void _saveStreams({StreamType type}) {
@@ -345,6 +368,8 @@ class _Tab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tab(
         child: Text(AppLocalizations.of(context).translate(title),
-            style: TextStyle(fontSize: 20, color: CustomColor().themeBrightnessColor(context))));
+            style: TextStyle(
+                fontSize: 20,
+                color: CustomColor().themeBrightnessColor(context))));
   }
 }

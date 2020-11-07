@@ -3,8 +3,8 @@ import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/service_locator.dart';
 import 'package:fastotvlite/shared_prefs.dart';
 import 'package:fastotvlite/tv/settings/tv_settings_page.dart';
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -28,12 +28,10 @@ class _ClockFormatPickerTVState extends State<ClockFormatPickerTV> {
     return Focus(
         canRequestFocus: false,
         child: Container(
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  _dialogItem('13:00', 0),
-                  _dialogItem('1:00 PM', 1)
-                ])));
+            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+          _dialogItem('13:00', 0),
+          _dialogItem('1:00 PM', 1)
+        ])));
   }
 
   Widget _dialogItem(String text, int itemvalue) {
@@ -43,7 +41,9 @@ class _ClockFormatPickerTVState extends State<ClockFormatPickerTV> {
         child: Container(
             decoration: BoxDecoration(
                 border: Border.all(
-                    color: borderColor(itemvalue == _currentSelection && widget.focus.hasPrimaryFocus), width: 2)),
+                    color: borderColor(itemvalue == _currentSelection &&
+                        widget.focus.hasPrimaryFocus),
+                    width: 2)),
             child: RadioListTile(
                 activeColor: CustomColor().tvSelectedColor(),
                 title: Text(text, style: TextStyle(fontSize: 20)),

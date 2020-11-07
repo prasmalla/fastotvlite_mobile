@@ -1,5 +1,5 @@
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/base/login/textfields.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
@@ -73,7 +73,8 @@ class _AgePickerTVState extends State<AgePickerTV> {
 
   Widget ageWidget() {
     return ListTile(
-        leading: Icon(Icons.child_care, color: CustomColor().themeBrightnessColor(context)),
+        leading: Icon(Icons.child_care,
+            color: CustomColor().themeBrightnessColor(context)),
         title: Text(AppLocalizations.of(context).translate(TR_AGE_RESTRICTION),
             softWrap: true, style: TextStyle(fontSize: 20)));
   }
@@ -83,14 +84,21 @@ class _AgePickerTVState extends State<AgePickerTV> {
     return Focus(
         onKey: _listControl,
         focusNode: widget.focus,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
+            Widget>[
           Container(
               decoration: BoxDecoration(
-                  border: Border.all(color: borderColor(0 == currentFocus && widget.focus.hasPrimaryFocus), width: 2)),
+                  border: Border.all(
+                      color: borderColor(
+                          0 == currentFocus && widget.focus.hasPrimaryFocus),
+                      width: 2)),
               child: ageWidget()),
           Container(
               decoration: BoxDecoration(
-                  border: Border.all(color: borderColor(1 == currentFocus && widget.focus.hasPrimaryFocus), width: 2)),
+                  border: Border.all(
+                      color: borderColor(
+                          1 == currentFocus && widget.focus.hasPrimaryFocus),
+                      width: 2)),
               child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
                 Icon(Icons.arrow_left),
                 Text('$ageRating', style: TextStyle(fontSize: 24)),
@@ -107,7 +115,8 @@ class AgePickerPassword extends StatefulWidget {
 
 class _AgePickerPasswordState extends State<AgePickerPassword> {
   FocusNode backButtonNode = FocusNode();
-  final TextFieldNode passwordNode = TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
+  final TextFieldNode passwordNode =
+      TextFieldNode(main: FocusNode(), text: FocusNode(skipTraversal: true));
   final passwordController = TextEditingController();
   bool validatePassword = true;
   String password = '';
@@ -134,7 +143,8 @@ class _AgePickerPasswordState extends State<AgePickerPassword> {
     Color buttonColor(FocusNode node) {
       return node.hasPrimaryFocus
           ? CustomColor().tvSelectedColor()
-          : CustomColor().backGroundColorBrightness(Theme.of(context).primaryColor);
+          : CustomColor()
+              .backGroundColorBrightness(Theme.of(context).primaryColor);
     }
 
     return Stack(children: <Widget>[
@@ -173,7 +183,8 @@ class _AgePickerPasswordState extends State<AgePickerPassword> {
       errorText: _errorText(),
       hintText: _translate(TR_PASSWORD),
       onFieldSubmit: () {
-        validatePassword = passwordController.text.isNotEmpty && password == passwordController.text;
+        validatePassword = passwordController.text.isNotEmpty &&
+            password == passwordController.text;
         if (validatePassword) {
           Navigator.of(context).pop(true);
         } else {
@@ -196,7 +207,9 @@ class _AgePickerPasswordState extends State<AgePickerPassword> {
             leading: backButton(),
             elevation: 0,
             title: Text(_translate(TR_PARENTAL_CONTROL),
-                style: TextStyle(color: CustomColor().backGroundColorBrightness(Theme.of(context).primaryColor))),
+                style: TextStyle(
+                    color: CustomColor().backGroundColorBrightness(
+                        Theme.of(context).primaryColor))),
             centerTitle: true),
         body: Center(
             child: Container(
@@ -208,8 +221,11 @@ class _AgePickerPasswordState extends State<AgePickerPassword> {
                     children: <Widget>[
                       Padding(
                           padding: const EdgeInsets.all(24.0),
-                          child: Text(AppLocalizations.of(context).translate(TR_AGE_RESTRICTION_PASSWORD),
-                              softWrap: true, style: TextStyle(fontSize: 24))),
+                          child: Text(
+                              AppLocalizations.of(context)
+                                  .translate(TR_AGE_RESTRICTION_PASSWORD),
+                              softWrap: true,
+                              style: TextStyle(fontSize: 24))),
                       passwordField()
                     ]))));
   }

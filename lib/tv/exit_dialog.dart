@@ -1,6 +1,6 @@
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/system_methods.dart' as system;
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/system_methods.dart' as system;
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +54,8 @@ class _ExitDialogState extends State<ExitDialog> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => FocusScope.of(context).requestFocus(no));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => FocusScope.of(context).requestFocus(no));
   }
 
   @override
@@ -63,35 +64,41 @@ class _ExitDialogState extends State<ExitDialog> {
 
     TextStyle buttonTextStyle(FocusNode node) {
       return TextStyle(
-          color: CustomColor()
-              .backGroundColorBrightness(node.hasPrimaryFocus ? selectedColor : Theme.of(context).backgroundColor));
+          color: CustomColor().backGroundColorBrightness(node.hasPrimaryFocus
+              ? selectedColor
+              : Theme.of(context).backgroundColor));
     }
 
-    return AlertDialog(title: Text(_translate(TR_EXIT)), content: Text(_translate(TR_EXIT_MESSAGE)), actions: <Widget>[
-      RawKeyboardListener(
-          focusNode: no,
-          onKey: (RawKeyEvent event) {
-            onKey(event, no, context);
-          },
-          child: FlatButton(
-              child: Text(_translate(TR_NO), style: buttonTextStyle(no)),
-              color: no.hasPrimaryFocus ? selectedColor : Colors.transparent,
-              onPressed: () {
-                Navigator.of(context).pop();
-              })),
-      RawKeyboardListener(
-          focusNode: yes,
-          onKey: (RawKeyEvent event) {
-            onKey(event, yes, context);
-          },
-          child: FlatButton(
-              child: Text(_translate(TR_YES), style: buttonTextStyle(yes)),
-              color: yes.hasPrimaryFocus ? selectedColor : Colors.transparent,
-              onPressed: () {
-                Navigator.of(context).pop();
-                system.exitApp();
-              }))
-    ]);
+    return AlertDialog(
+        title: Text(_translate(TR_EXIT)),
+        content: Text(_translate(TR_EXIT_MESSAGE)),
+        actions: <Widget>[
+          RawKeyboardListener(
+              focusNode: no,
+              onKey: (RawKeyEvent event) {
+                onKey(event, no, context);
+              },
+              child: FlatButton(
+                  child: Text(_translate(TR_NO), style: buttonTextStyle(no)),
+                  color:
+                      no.hasPrimaryFocus ? selectedColor : Colors.transparent,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  })),
+          RawKeyboardListener(
+              focusNode: yes,
+              onKey: (RawKeyEvent event) {
+                onKey(event, yes, context);
+              },
+              child: FlatButton(
+                  child: Text(_translate(TR_YES), style: buttonTextStyle(yes)),
+                  color:
+                      yes.hasPrimaryFocus ? selectedColor : Colors.transparent,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    system.exitApp();
+                  }))
+        ]);
   }
 
   String _translate(String key) => AppLocalizations.of(context).translate(key);

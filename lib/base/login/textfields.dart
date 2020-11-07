@@ -1,4 +1,4 @@
-import 'package:fastotv_common/colors.dart';
+import 'package:flutter_common/colors.dart';
 import 'package:flutter/material.dart';
 
 const double TEXTFIELD_PADDING = 4;
@@ -14,10 +14,13 @@ OutlineInputBorder border(BuildContext context, FocusNode focus) {
   final activeColor = CustomColor().tvSelectedColor();
   if (focus != null) {
     if (focus.hasPrimaryFocus) {
-      return OutlineInputBorder(borderSide: BorderSide(color: activeColor, width: 4));
+      return OutlineInputBorder(
+          borderSide: BorderSide(color: activeColor, width: 4));
     }
   }
-  return OutlineInputBorder(borderSide: BorderSide(color: CustomColor().themeBrightnessColor(context), width: 1));
+  return OutlineInputBorder(
+      borderSide: BorderSide(
+          color: CustomColor().themeBrightnessColor(context), width: 1));
 }
 
 class TextFieldNode {
@@ -69,10 +72,12 @@ class _LoginTextFieldState extends State<LoginTextField> {
   OutlineInputBorder errorBorder() {
     if (widget.mainFocus != null) {
       if (widget.mainFocus.hasPrimaryFocus) {
-        return OutlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 4));
+        return OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 4));
       }
     }
-    return OutlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 1));
+    return OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red, width: 1));
   }
 
   String error() {

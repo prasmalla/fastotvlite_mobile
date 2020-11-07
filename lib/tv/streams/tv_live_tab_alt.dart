@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 
 import 'package:fastotv_dart/commands_info/programme_info.dart';
 
-import 'package:fastotv_common/base/controls/favorite_button.dart';
-import 'package:fastotv_common/base/controls/no_channels.dart';
-import 'package:fastotv_common/scroll_controller_manager.dart';
-import 'package:fastotv_common/tv/key_code.dart';
-import 'package:fastotv_common/colors.dart';
+import 'package:flutter_common/base/controls/favorite_button.dart';
+import 'package:flutter_common/base/controls/no_channels.dart';
+import 'package:flutter_common/scroll_controller_manager.dart';
+import 'package:flutter_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
 
 import 'package:flutter_fastotv_common/base/controls/preview_icon.dart';
 
@@ -59,7 +59,7 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
   FocusNode playerFocus = FocusNode();
 
   String _currentCategory = TR_ALL;
-  
+
   int currentChannel = 0;
 
   Map<String, List<LiveStream>> channelsMap = {};
@@ -72,7 +72,8 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
 
   LiveStream _playing;
 
-  CustomScrollController _channelsController = CustomScrollController(itemHeight: LIST_ITEM_SIZE);
+  CustomScrollController _channelsController =
+      CustomScrollController(itemHeight: LIST_ITEM_SIZE);
 
   ProgramsBloc programsBloc;
 
@@ -84,13 +85,15 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
     _parseChannels();
 
     final tvTabsEvent = locator<TvTabsEvents>();
-    tvTabsEvent.subscribe<OpenedTvSettings>().listen((event) => controlFromTabs(event.value));
-    
+    tvTabsEvent
+        .subscribe<OpenedTvSettings>()
+        .listen((event) => controlFromTabs(event.value));
+
     final _search = locator<SearchEvents>();
     _search.subscribe<SearchEvent<LiveStream>>().listen((event) {
       _onSearch(event.stream);
     });
-    
+
     _playing = _currentChannels[0];
     _initPlayerPage(_playing);
     _initProgramsBloc(_playing);
@@ -108,10 +111,15 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
   Widget build(BuildContext context) {
     final availableSpace = MediaQuery.of(context).size * scale;
 
-    return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+    return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: <
+        Widget>[
       Visibility(
           visible: notFullScreen,
-          child: Column(children: <Widget>[categoriesList(availableSpace), Divider(height: 0.0), channelsList(availableSpace)])),
+          child: Column(children: <Widget>[
+            categoriesList(availableSpace),
+            Divider(height: 0.0),
+            channelsList(availableSpace)
+          ])),
       Visibility(visible: notFullScreen, child: VerticalDivider(width: 0.0)),
       Expanded(
           child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
@@ -131,10 +139,12 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
   }
 
   Widget channelsList(Size availableSpace) {
-    final _size = Size(availableSpace.width / 5, availableSpace.height - LIST_HEADER_SIZE - 72);
+    final _size = Size(availableSpace.width / 5,
+        availableSpace.height - LIST_HEADER_SIZE - 72);
     if (_currentCategory == TR_FAVORITE && channelsMap[TR_FAVORITE].isEmpty) {
       return _NoChannels.favorite(_size);
-    } else if (_currentCategory == TR_RECENT && channelsMap[TR_RECENT].isEmpty) {
+    } else if (_currentCategory == TR_RECENT &&
+        channelsMap[TR_RECENT].isEmpty) {
       return _NoChannels.recent(_size);
     }
     return _ChannelsList(
@@ -144,30 +154,41 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
         itemHeight: LIST_ITEM_SIZE,
         size: _size);
   }
-  
+
   Widget channelInfo(Size availableSpace) {
     return Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
-          _TimeLine(programsBloc, Size(availableSpace.width / 2, 36 * scale)),
-          SizedBox(height: 16 * scale),
-          Row(children: <Widget>[
-            Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-              Text(AppLocalizations.of(context).translate(TR_CURRENT_CHANNEL)),
-              Text(AppLocalizations.toUtf8(_playing.displayName()),
-                  style: TextStyle(fontSize: 24 * scale), overflow: TextOverflow.ellipsis)
-            ]),
-            Spacer(),
-            FavoriteStarButton(_playing.favorite(),
-                onFavoriteChanged: (bool value) => _handleFavorite(), selectedColor: CustomColor().tvSelectedColor()),
-            CustomIcons(Icons.edit, () => _editChannel(_playing)),
-            CustomIcons(Icons.delete, () => _deleteChannel(_playing))
-          ]),
-          SizedBox(height: 16 * scale),
-          _ProgramTitle(programsBloc),
-          _ProgramName(programsBloc, Size(availableSpace.width / 2, 24 * scale), 24 * scale)
-        ]));
-    }
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _TimeLine(
+                  programsBloc, Size(availableSpace.width / 2, 36 * scale)),
+              SizedBox(height: 16 * scale),
+              Row(children: <Widget>[
+                Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(AppLocalizations.of(context)
+                          .translate(TR_CURRENT_CHANNEL)),
+                      Text(AppLocalizations.toUtf8(_playing.displayName()),
+                          style: TextStyle(fontSize: 24 * scale),
+                          overflow: TextOverflow.ellipsis)
+                    ]),
+                Spacer(),
+                FavoriteStarButton(_playing.favorite(),
+                    onFavoriteChanged: (bool value) => _handleFavorite(),
+                    selectedColor: CustomColor().tvSelectedColor()),
+                CustomIcons(Icons.edit, () => _editChannel(_playing)),
+                CustomIcons(Icons.delete, () => _deleteChannel(_playing))
+              ]),
+              SizedBox(height: 16 * scale),
+              _ProgramTitle(programsBloc),
+              _ProgramName(programsBloc,
+                  Size(availableSpace.width / 2, 24 * scale), 24 * scale)
+            ]));
+  }
 
   Widget programs(Size availableSpace) {
     return _Programs(
@@ -176,7 +197,8 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
         programsBloc);
   }
 
-  Color selectedColor(FocusNode focus) => focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
+  Color selectedColor(FocusNode focus) =>
+      focus.hasPrimaryFocus ? CustomColor().tvSelectedColor() : Colors.grey;
 
   void controlFromTabs(bool settingsOpened) {
     if (mounted) {
@@ -184,7 +206,7 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
         _playerPage.pause();
       } else {
         _playerPage.playChannel(_playing);
-      } 
+      }
     }
   }
 
@@ -197,7 +219,7 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
     if (_playerPage != null) {
       return;
     }
-    _playerPage = StreamPlayerPage(channel: channel);    
+    _playerPage = StreamPlayerPage(channel: channel);
   }
 
   void _initProgramsBloc(LiveStream channel) {
@@ -272,7 +294,9 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
     if (show) {
       _isSnackbarActive = true;
       final contentColor = CustomColor().themeBrightnessColor(context);
-      final backColor = Theme.of(context).brightness == Brightness.dark ? Colors.black87 : Colors.white70;
+      final backColor = Theme.of(context).brightness == Brightness.dark
+          ? Colors.black87
+          : Colors.white70;
       final snack = SnackBar(
           backgroundColor: backColor,
           content: Container(
@@ -284,7 +308,8 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
                 maxLines: 1,
                 softWrap: false),
             Spacer(),
-            Icon(_playerPage.isPlaying() ? Icons.pause : Icons.play_arrow, size: 48, color: contentColor)
+            Icon(_playerPage.isPlaying() ? Icons.pause : Icons.play_arrow,
+                size: 48, color: contentColor)
           ])));
       Scaffold.of(context).showSnackBar(snack).closed.then((_) {
         _isSnackbarActive = false;
@@ -334,7 +359,8 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
 
   void _addRecent(LiveStream channel) {
     if (channelsMap[TR_RECENT].contains(channel)) {
-      channelsMap[TR_RECENT].sort((b, a) => a.recentTime().compareTo(b.recentTime()));
+      channelsMap[TR_RECENT]
+          .sort((b, a) => a.recentTime().compareTo(b.recentTime()));
     } else {
       channelsMap[TR_RECENT].insert(0, channel);
     }
@@ -373,8 +399,8 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
 
   void _editChannel(LiveStream channel) async {
     final epgUrl = channel.epgUrl();
-    LiveStream response =
-        await Navigator.of(context).push(MaterialPageRoute(builder: (context) => LiveEditPageTV(channel)));
+    LiveStream response = await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LiveEditPageTV(channel)));
     _parseChannels();
     if (response.epgUrl() != epgUrl) {
       channel.setRequested(false);
@@ -557,7 +583,9 @@ class _ChannelsTabHomeTVState extends State<ChannelsTabHomeTV> {
 
   void setFullscreenOff(bool visibility) {
     notFullScreen = visibility;
-    TvChannelNotification(title: NotificationType.FULLSCREEN, visibility: notFullScreen)..dispatch(context);
+    TvChannelNotification(
+        title: NotificationType.FULLSCREEN, visibility: notFullScreen)
+      ..dispatch(context);
     final settings = locator<LocalStorageService>();
     if (notFullScreen) {
       settings.setLastChannel(null);
@@ -606,11 +634,13 @@ class _CategoriesState extends State<_Categories> {
         child: Container(
             width: widget.size.width,
             height: widget.size.height,
-            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-              Icon(Icons.keyboard_arrow_left, color: _color),
-              Text(_title(widget.category)),
-              Icon(Icons.keyboard_arrow_right, color: _color)
-            ])));
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Icon(Icons.keyboard_arrow_left, color: _color),
+                  Text(_title(widget.category)),
+                  Icon(Icons.keyboard_arrow_right, color: _color)
+                ])));
   }
 
   void _onFocusChange() {
@@ -657,7 +687,10 @@ class _ChannelsList extends StatelessWidget {
             itemExtent: _itemHeight,
             itemBuilder: (context, index) {
               final channel = channels[index];
-              return _ChannelTile(channel: channel, onKey: (node, event) => onKey(node, event, index), itemHeight: _itemHeight);
+              return _ChannelTile(
+                  channel: channel,
+                  onKey: (node, event) => onKey(node, event, index),
+                  itemHeight: _itemHeight);
             }));
   }
 }
@@ -667,10 +700,7 @@ class _ChannelTile extends StatefulWidget {
   final double itemHeight;
   final bool Function(FocusNode node, RawKeyEvent event) onKey;
 
-  _ChannelTile(
-      {@required this.channel,
-      @required this.onKey,
-      this.itemHeight});
+  _ChannelTile({@required this.channel, @required this.onKey, this.itemHeight});
 
   @override
   _ChannelTileState createState() => _ChannelTileState();
@@ -718,7 +748,8 @@ class _ChannelTileState extends State<_ChannelTile> {
   }
 
   Widget _channelAvatar(LiveStream channel) {
-    return PreviewIcon.live(channel.icon(), height: CHANNEL_AVATAR_SIZE.height, width: CHANNEL_AVATAR_SIZE.width);
+    return PreviewIcon.live(channel.icon(),
+        height: CHANNEL_AVATAR_SIZE.height, width: CHANNEL_AVATAR_SIZE.width);
   }
 
   Color _backgroundColor() {
@@ -745,20 +776,23 @@ class _TimeLine extends StatelessWidget {
     return StreamBuilder<ProgrammeInfo>(
         stream: programsBloc.currentProgram,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              snapshot.data == null) {
             return SizedBox();
           }
           return Container(
               width: size.width,
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-                LiveTime.current(programmeInfo: snapshot.data),
-                LiveTimeLine(
-                    programmeInfo: snapshot.data,
-                    width: size.width / 1.5,
-                    height: 6,
-                    color: CustomColor().tvSelectedColor()),
-                LiveTime.end(programmeInfo: snapshot.data)
-              ]));
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    LiveTime.current(programmeInfo: snapshot.data),
+                    LiveTimeLine(
+                        programmeInfo: snapshot.data,
+                        width: size.width / 1.5,
+                        height: 6,
+                        color: CustomColor().tvSelectedColor()),
+                    LiveTime.end(programmeInfo: snapshot.data)
+                  ]));
         });
   }
 }
@@ -775,14 +809,16 @@ class _ProgramName extends StatelessWidget {
     return StreamBuilder<ProgrammeInfo>(
         stream: programsBloc.currentProgram,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              snapshot.data == null) {
             return SizedBox();
           }
           return Container(
               height: size.height,
               width: size.width,
               child: Text(AppLocalizations.toUtf8(snapshot.data?.title ?? ''),
-                  overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: textSize)));
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: textSize)));
         });
   }
 }
@@ -797,7 +833,8 @@ class _ProgramTitle extends StatelessWidget {
     return StreamBuilder<ProgrammeInfo>(
         stream: programsBloc.currentProgram,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              snapshot.data == null) {
             return SizedBox();
           }
           return Text(AppLocalizations.of(context).translate(TR_NOW_PLAYING));
@@ -861,9 +898,16 @@ class _TvPlayerWrapState extends State<_TvPlayerWrap> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: !widget.fullscreen ? widget.availableSpace.height / 2 : widget.availableSpace.height,
-        decoration: BoxDecoration(color: Colors.black, border: Border.all(color: _color, width: 2)),
-        child: Focus(onKey: widget.onKey, focusNode: _node, child: widget.child, autofocus: widget.fullscreen));
+        height: !widget.fullscreen
+            ? widget.availableSpace.height / 2
+            : widget.availableSpace.height,
+        decoration: BoxDecoration(
+            color: Colors.black, border: Border.all(color: _color, width: 2)),
+        child: Focus(
+            onKey: widget.onKey,
+            focusNode: _node,
+            child: widget.child,
+            autofocus: widget.fullscreen));
   }
 
   void _onFocusChange() {

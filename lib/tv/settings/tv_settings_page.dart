@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/constants.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
@@ -49,7 +49,13 @@ class _SettingPageTVState extends State<SettingPageTV> {
 
   final activeColor = CustomColor().tvSelectedColor();
 
-  static const ITEM_LIST = [TR_PARENTAL_CONTROL, TR_THEME, TR_SCREEN_SIZE, TR_LANGUAGE, TR_TIME_FORMAT];
+  static const ITEM_LIST = [
+    TR_PARENTAL_CONTROL,
+    TR_THEME,
+    TR_SCREEN_SIZE,
+    TR_LANGUAGE,
+    TR_TIME_FORMAT
+  ];
 
   Widget _getCurrentSetting(int current) {
     switch (current) {
@@ -60,7 +66,8 @@ class _SettingPageTVState extends State<SettingPageTV> {
           return ThemePickerTV(settingsList, () => _toCategories(), model);
         });
       case 2:
-        return PaddingSettings(settingsList, () => _toCategories(), paddingCallback);
+        return PaddingSettings(
+            settingsList, () => _toCategories(), paddingCallback);
       case 3:
         return LanguagePickerTV(settingsList, () => setState(() {}));
       case 4:
@@ -109,7 +116,8 @@ class _SettingPageTVState extends State<SettingPageTV> {
     final categoriesWidth = availableWidth / 4;
     final sideFieldsWidth = (availableWidth - categoriesWidth) / 2;
     final listHeight = LIST_ITEM_SIZE * ITEM_LIST.length;
-    final verticalDivider = Container(height: listHeight, child: VerticalDivider(width: 0));
+    final verticalDivider =
+        Container(height: listHeight, child: VerticalDivider(width: 0));
     return FocusScope(
         node: settingsScope,
         child: FractionallySizedBox(
@@ -120,9 +128,11 @@ class _SettingPageTVState extends State<SettingPageTV> {
                   appBar: AppBar(
                       leading: _backButton(),
                       elevation: 0,
-                      title: Text(AppLocalizations.of(context).translate(TR_SETTINGS),
+                      title: Text(
+                          AppLocalizations.of(context).translate(TR_SETTINGS),
                           style: TextStyle(
-                              color: CustomColor().backGroundColorBrightness(Theme.of(context).primaryColor))),
+                              color: CustomColor().backGroundColorBrightness(
+                                  Theme.of(context).primaryColor))),
                       centerTitle: true),
                   body: Container(
                       color: Theme.of(context).primaryColor,
@@ -150,10 +160,15 @@ class _SettingPageTVState extends State<SettingPageTV> {
                                         itemBuilder: (context, index) => Container(
                                             decoration: BoxDecoration(
                                                 border: Border.all(
-                                                    color: getDecoration(categoriesList, currentType, index),
+                                                    color: getDecoration(
+                                                        categoriesList,
+                                                        currentType,
+                                                        index),
                                                     width: 2)),
                                             child: ListTile(
-                                                title: Text(AppLocalizations.of(context).translate(ITEM_LIST[index]),
+                                                title: Text(
+                                                    AppLocalizations.of(context)
+                                                        .translate(ITEM_LIST[index]),
                                                     style: textStyle)))))),
                             verticalDivider,
                             Container(
@@ -162,7 +177,8 @@ class _SettingPageTVState extends State<SettingPageTV> {
                                 constraints: new BoxConstraints(
                                   minHeight: LIST_ITEM_SIZE * 5.0,
                                 ),
-                                child: Center(child: _getCurrentSetting(currentType)))
+                                child: Center(
+                                    child: _getCurrentSetting(currentType)))
                           ]))),
               paddingSetupContainer(),
               paddingSetupContainer(right: 0),
@@ -175,7 +191,8 @@ class _SettingPageTVState extends State<SettingPageTV> {
     Color buttonColor(FocusNode node) {
       return node.hasPrimaryFocus
           ? activeColor
-          : CustomColor().backGroundColorBrightness(Theme.of(context).primaryColor);
+          : CustomColor()
+              .backGroundColorBrightness(Theme.of(context).primaryColor);
     }
 
     return Focus(
@@ -191,10 +208,14 @@ class _SettingPageTVState extends State<SettingPageTV> {
   }
 
   Widget paddingSetupContainer({double right, double bottom}) {
-    Color color = settingsList.hasPrimaryFocus && ITEM_LIST[currentType] == TR_SCREEN_SIZE
-        ? Colors.redAccent
-        : Colors.transparent;
-    return Positioned(right: right, bottom: bottom, child: Container(color: color, width: 24, height: 24));
+    Color color =
+        settingsList.hasPrimaryFocus && ITEM_LIST[currentType] == TR_SCREEN_SIZE
+            ? Colors.redAccent
+            : Colors.transparent;
+    return Positioned(
+        right: right,
+        bottom: bottom,
+        child: Container(color: color, width: 24, height: 24));
   }
 
   void _nextCategory() {
@@ -218,7 +239,8 @@ class _SettingPageTVState extends State<SettingPageTV> {
   }
 
   void _toPassword() async {
-    bool passed = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => AgePickerPassword()));
+    bool passed = await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => AgePickerPassword()));
     if (passed) {
       settingsList.requestFocus();
     } else {

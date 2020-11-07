@@ -1,5 +1,5 @@
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/localization/app_localizations.dart';
 import 'package:fastotvlite/localization/translations.dart';
 import 'package:fastotvlite/tv/settings/tv_settings_page.dart';
@@ -53,10 +53,13 @@ class _ThemePickerTVState extends State<ThemePickerTV> {
         child: Container(
             decoration: BoxDecoration(
                 border: Border.all(
-                    color: borderColor(itemvalue == themeGroupValue && widget.focus.hasPrimaryFocus), width: 2)),
+                    color: borderColor(itemvalue == themeGroupValue &&
+                        widget.focus.hasPrimaryFocus),
+                    width: 2)),
             child: RadioListTile(
                 activeColor: CustomColor().tvSelectedColor(),
-                title: Text(AppLocalizations.of(context).translate(text), style: TextStyle(fontSize: 20)),
+                title: Text(AppLocalizations.of(context).translate(text),
+                    style: TextStyle(fontSize: 20)),
                 value: itemvalue,
                 groupValue: themeGroupValue,
                 onChanged: _changeTheme)));

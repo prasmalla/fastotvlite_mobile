@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:fastotv_common/tv/key_code.dart';
+import 'package:flutter_common/tv/key_code.dart';
 import 'package:fastotvlite/service_locator.dart';
 import 'package:fastotvlite/shared_prefs.dart';
 import 'package:fastotvlite/tv/settings/tv_settings_page.dart';
@@ -32,14 +32,22 @@ class _PaddingSettingsState extends State<PaddingSettings> {
 
   @override
   Widget build(BuildContext context) {
-    symbolsStyle = TextStyle(fontSize: 32, color: borderColor(widget.focus.hasPrimaryFocus));
+    symbolsStyle = TextStyle(
+        fontSize: 32, color: borderColor(widget.focus.hasPrimaryFocus));
     return Focus(
         focusNode: widget.focus,
         onKey: _listControl,
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          Padding(padding: const EdgeInsets.all(8.0), child: Text('+', style: symbolsStyle)),
-          Container(child: Center(child: Text((percent * 100).toStringAsFixed(1) + '%', style: textStyle))),
-          Padding(padding: const EdgeInsets.all(8.0), child: Text('-', style: symbolsStyle))
+          Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('+', style: symbolsStyle)),
+          Container(
+              child: Center(
+                  child: Text((percent * 100).toStringAsFixed(1) + '%',
+                      style: textStyle))),
+          Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('-', style: symbolsStyle))
         ]));
   }
 

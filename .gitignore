@@ -15,7 +15,8 @@ ios/Flutter/Release.xcconfig
 ios/Podfile
 packages
 .flutter-plugins
-
+.dart_tool
+.flutter-plugins-dependencies
 android/key.properties
 .metadata
 *.iml

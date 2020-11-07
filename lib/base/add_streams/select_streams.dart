@@ -1,5 +1,5 @@
-import 'package:fastotv_common/colors.dart';
-import 'package:fastotv_common/runtime_device.dart';
+import 'package:flutter_common/colors.dart';
+import 'package:flutter_common/runtime_device.dart';
 import 'package:fastotvlite/base/add_streams/m3u_to_channels.dart';
 import 'package:fastotvlite/base/vods/constants.dart';
 import 'package:fastotvlite/base/vods/vod_card_favorite_pos.dart';
@@ -39,7 +39,8 @@ abstract class BaseSelectStreamPage<T extends StatefulWidget> extends State<T> {
 
   // private
   void _parseText() async {
-    AddStreamResponse result = await M3UParser(m3uText(), type()).parseChannelsFromString();
+    AddStreamResponse result =
+        await M3UParser(m3uText(), type()).parseChannelsFromString();
     channels = result.channels;
     vods = result.vods;
     final current = selectedList();
@@ -66,10 +67,13 @@ abstract class BaseSelectStreamPage<T extends StatefulWidget> extends State<T> {
     final current = selectedList();
     for (int i = 0; i < current.length; i++) {
       if (checkValues[i]) {
-        type() == StreamType.Live ? outputLive.add(current[i]) : outputVods.add(current[i]);
+        type() == StreamType.Live
+            ? outputLive.add(current[i])
+            : outputVods.add(current[i]);
       }
     }
-    Navigator.of(context).pop(AddStreamResponse(type(), channels: outputLive, vods: outputVods));
+    Navigator.of(context)
+        .pop(AddStreamResponse(type(), channels: outputLive, vods: outputVods));
   }
 
   void onBack() {
@@ -94,7 +98,9 @@ class LiveSelectTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final device = locator<RuntimeDevice>();
-    final accentColor = device.hasTouch ? Theme.of(context).accentColor : CustomColor().tvSelectedColor();
+    final accentColor = device.hasTouch
+        ? Theme.of(context).accentColor
+        : CustomColor().tvSelectedColor();
     final textColor = CustomColor().backGroundColorBrightness(accentColor);
     return CheckboxListTile(
         activeColor: accentColor,
@@ -126,7 +132,10 @@ class VodSelectCard extends StatelessWidget {
           onPressed: () {}),
       VodFavoriteButton(
           child: Checkbox(
-              activeColor: accentColor, checkColor: textColor, value: value, onChanged: (value) => onCheckBox()))
+              activeColor: accentColor,
+              checkColor: textColor,
+              value: value,
+              onChanged: (value) => onCheckBox()))
     ]);
   }
 }
